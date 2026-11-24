@@ -3,8 +3,8 @@
   "active": {
     "issue": 55,
     "version": "v0.0.3.2",
-    "phase": "Internal Auditor",
-    "next_action": "10/10 public PR jobs passed; all three real Blender logs confirm multi-scene regression. Solo audit: review scope, artifact checks, source preservation, compatibility and exact merge tree.",
+    "phase": "Head",
+    "next_action": "Solo audit PASS: six scoped files, existing exporter defaults and guards preserved; exact PR and merge tree verified; real Blender logs pass. Owner explicitly approved PR #108 merge at ec16f70. Graphify archive is older; no fresh candidate graph claimed. Integrate once and verify main push CI.",
     "fix_sha": "ec16f705f82ead2734ec9fe6a7eb68f2af62be96",
     "candidate_sha": "ec16f705f82ead2734ec9fe6a7eb68f2af62be96",
     "pull_request": 108,
