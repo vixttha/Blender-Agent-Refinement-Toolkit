@@ -184,7 +184,7 @@
     {
       "issue": 69,
       "version": "v0.0.3.3",
-      "state": "in_progress",
+      "state": "integrated",
       "acceptance": [
         "Align repair scope with existing geometry scope: active scene for STL/OBJ/FBX; file-wide source meshes for BLEND/GLB. Preserve deduplication by mesh datablock and original inputs.",
         "On real public Blender runners, verify that an inactive read-only linked mesh cannot block active-scene repair; verify actual weld and exported artifact.",

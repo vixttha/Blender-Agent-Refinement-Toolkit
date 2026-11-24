@@ -1,17 +1,6 @@
 {
   "schema_version": 1,
-  "active": {
-    "issue": 69,
-    "version": "v0.0.3.3",
-    "phase": "Head",
-    "next_action": "PR #109 already merged at 392d8d7a1c262227cba3c08d5577af38c74b4e25; do not merge again. Confirm main push CI at https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/actions/runs/45337193197/attempts/1 (7/10 passed at observation), then finish integrated and close issue #69. Owner approval recorded; no release.",
-    "fix_sha": "4e47aba6eec452865e1ec9e85ffab535c8ebb0d4",
-    "candidate_sha": "4e47aba6eec452865e1ec9e85ffab535c8ebb0d4",
-    "pull_request": 109,
-    "evidence": [
-      "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/actions/runs/45334949893/attempts/1"
-    ]
-  },
+  "active": null,
   "history": [
     {
       "handoff": {
@@ -30,6 +19,24 @@
       "disposition": "integrated",
       "decision": "Owner explicitly approved PR #108 as v0.0.3.2. Solo audit passed; exact accepted head and tested merge tree matched integrated main. Post-merge CI passed on exact merged SHA. No package release.",
       "merged_sha": "88982523f8469b1597efc604257110fee0b1977c"
+    },
+    {
+      "handoff": {
+        "issue": 69,
+        "version": "v0.0.3.3",
+        "phase": "Head",
+        "next_action": "Integrated and verified on main. All ten post-merge jobs passed, including all three real Blender logs confirming #69 and previous #55/shared mesh regressions. Close #69; no release.",
+        "fix_sha": "4e47aba6eec452865e1ec9e85ffab535c8ebb0d4",
+        "candidate_sha": "4e47aba6eec452865e1ec9e85ffab535c8ebb0d4",
+        "pull_request": 109,
+        "evidence": [
+          "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/actions/runs/45334949893/attempts/1",
+          "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/actions/runs/45337193197/attempts/1"
+        ]
+      },
+      "disposition": "integrated",
+      "decision": "Owner explicitly approved PR #109 at exact candidate as v0.0.3.3. Solo audit and exact-head CodeRabbit review passed. Main push CI 10/10 passed.",
+      "merged_sha": "392d8d7a1c262227cba3c08d5577af38c74b4e25"
     }
   ]
 }
