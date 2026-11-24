@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.0.3.2 — development checkpoint
+
+- Align pre-export geometry reporting with active-scene STL, OBJ and FBX exports and file-wide BLEND and GLB exports (#55). Preserve GLB multi-scene behavior and distinguish source geometry from artifact validation.
+
 ## v0.0.3.1 — branding checkpoint
 
 - Record **Blender-Agent Refinement Toolkit** as the locked product name and **BART** as the locked agent name.

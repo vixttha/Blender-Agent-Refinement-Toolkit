@@ -87,10 +87,10 @@ def _repair():
     return len(repaired)
 
 
-def _geometry():
+def _geometry(objects):
     total = {"mesh_objects": 0, "vertices": 0, "faces": 0,
              "boundary_edges": 0, "nonmanifold_edges": 0}
-    for obj in bpy.data.objects:
+    for obj in objects:
         if obj.type != "MESH":
             continue
         total["mesh_objects"] += 1
@@ -128,12 +128,15 @@ def main():
             repaired_meshes = _repair()
     else:
         raise ValueError("Unknown operation.")
-    geometry = _geometry()
+    output = Path(job["output"])
+    # BLEND saves the whole file; GLB preserves the default multi-scene export.
+    # Other exporters operate on the active scene. These are pre-export counts.
+    objects = bpy.data.objects if output.suffix.lower() in {".blend", ".glb"} else bpy.context.scene.objects
+    geometry = _geometry(objects)
     if operation == "repair":
         geometry["repaired_mesh_datablocks"] = repaired_meshes
     if geometry["vertices"] < 3 or geometry["faces"] < 1:
         raise ValueError("No mesh faces are available for output.")
-    output = Path(job["output"])
     _require_finished(_export(output), "mesh export")
     Path(job["report"]).write_text(json.dumps(geometry), encoding="utf-8")
 

@@ -325,7 +325,8 @@ def execute(
             _publish(temporary, final, root, overwrite=overwrite)
     result = {
         "ok": True, "operation": operation, "output": str(final.relative_to(root)),
-        "size_bytes": size, "geometry": details, "geometry_scope": "pre_export_scene",
+        "size_bytes": size, "geometry": details,
+        "geometry_scope": "pre_export_file" if suffix in {".blend", ".glb"} else "pre_export_scene",
         "artifact_validation": artifact_validation,
         "note": "Geometry summary only; not a production or printability certification.",
     }
