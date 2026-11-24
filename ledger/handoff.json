@@ -4,7 +4,7 @@
     "issue": 45,
     "version": "v0.0.3.4",
     "phase": "Head",
-    "next_action": "Solo internal audit PASS; 10/10 exact candidate public runner jobs passed, all three pinned LTS archives and runtime receipts verified. No in-scope merge blocker. Await explicit owner merge authorization for PR #110 at 4cb5c7a4fb52bbefca1ff1172604d66d67b63ee2. Recheck refs and review comments. PR #98 overlaps README; preserve security guidance in that separate candidate. No release.",
+    "next_action": "Owner explicitly authorized integration of PR #110 at 4cb5c7a4fb52bbefca1ff1172604d66d67b63ee2. Final solo audit and 10/10 public CI verified unchanged. CodeRabbit full review requested (comment 7126313290); reconcile exact-head review and any blockers before merging. If candidate or base changes, revalidate affected evidence. Then merge once, verify main push CI and archive #45. No release.",
     "fix_sha": "4cb5c7a4fb52bbefca1ff1172604d66d67b63ee2",
     "candidate_sha": "4cb5c7a4fb52bbefca1ff1172604d66d67b63ee2",
     "pull_request": 110,
