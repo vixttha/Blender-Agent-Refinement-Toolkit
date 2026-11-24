@@ -1,5 +1,14 @@
 {
   "schema_version": 1,
-  "active": null,
+  "active": {
+    "issue": 55,
+    "version": "v0.0.3.2",
+    "phase": "Worker",
+    "next_action": "Owner authorized #55. Reuse PR #81 geometry repair on main; preserve GLB multi-scene export behavior, verify active-scene mesh and whole-file summaries with real Blender. No merge or release.",
+    "fix_sha": null,
+    "candidate_sha": null,
+    "pull_request": null,
+    "evidence": []
+  },
   "history": []
 }
