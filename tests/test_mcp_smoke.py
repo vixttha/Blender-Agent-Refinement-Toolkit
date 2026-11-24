@@ -5,6 +5,7 @@ import hashlib
 import json
 import math
 import os
+import re
 import shlex
 import shutil
 import struct
@@ -23,6 +24,9 @@ async def call_tool(session, name, **arguments):
     if payload is None:
         payload = json.loads(result.content[0].text)
     assert isinstance(payload, dict), (name, payload)
+    if name != "inspect_model":
+        expected_version = os.environ.get("BART_EXPECTED_BLENDER_VERSION")
+        assert expected_version and payload["blender_version"] == expected_version, payload
     print(f"MCP tool passed: {name} {subject}", flush=True)
     return payload
 
@@ -370,6 +374,14 @@ async def verify_blender_scheduling(cli, blender, host_directory, workspace, env
 
 
 async def smoke(blender):
+    if blender is not None:
+        banner = subprocess.check_output([str(blender), "--version"], text=True, timeout=20)
+        match = re.search(r"^Blender (\d+\.\d+\.\d+)\b", banner, re.M)
+        assert match, banner
+        expected = os.environ.get("BART_EXPECTED_BLENDER_VERSION", match.group(1))
+        assert match.group(1) == expected, (expected, banner)
+        os.environ["BART_EXPECTED_BLENDER_VERSION"] = expected
+        print(f"MCP runtime version receipt: {expected}", flush=True)
     from mcp import ClientSession, StdioServerParameters
     from mcp.client.stdio import stdio_client
 

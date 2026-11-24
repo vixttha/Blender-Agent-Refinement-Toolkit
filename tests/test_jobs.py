@@ -32,7 +32,7 @@ def fixture(command, *, cwd, timeout):
     output = Path(job["output"])
     output.write_text("mtllib out.mtl\\nv 0 0 0\\nv 1 0 0\\nv 0 1 0\\nf 1 2 3\\n")
     output.with_suffix(".mtl").write_bytes(b"interrupted material")
-    Path(job["report"]).write_text('{"mesh_objects": 1, "vertices": 3, "faces": 1}')
+    Path(job["report"]).write_text('{"mesh_objects": 1, "vertices": 3, "faces": 1, "blender_version": "4.5.16"}')
 
 publish = jobs._publish
 def interrupt_after_material(temporary, final, root, *, overwrite):
@@ -62,7 +62,7 @@ class JobTests(unittest.TestCase):
         output.write_bytes({".stl": TRIANGLE_STL, ".obj": TRIANGLE_OBJ}.get(output.suffix, b"mock-export"))
         Path(job["report"]).write_text(
             json.dumps({"mesh_objects": 1, "vertices": 8, "faces": 6,
-                        "boundary_edges": 0, "nonmanifold_edges": 0}),
+                        "boundary_edges": 0, "nonmanifold_edges": 0, "blender_version": "4.5.16"}),
             encoding="utf-8",
         )
         return "success"
@@ -88,6 +88,25 @@ class JobTests(unittest.TestCase):
                 execute("create", workspace=self.root, output="cube.obj", kind="cube")
         self.assertEqual((self.root / "cube.obj").read_bytes(), b"other writer")
         self.assertFalse((self.root / "cube.mtl").exists())
+
+    def test_runtime_report_rejected_before_publication(self):
+        for version in (None, "4.5.14", "5.1.99", "4.5.015", "5.2.2", "garbage", 4516):
+            with self.subTest(version=version):
+                def fake(command, *, cwd, timeout):
+                    self.fake_success(command, cwd=cwd, timeout=timeout)
+                    job = json.loads(Path(command[-1]).read_text(encoding="utf-8"))
+                    report = Path(job["report"])
+                    data = json.loads(report.read_text(encoding="utf-8"))
+                    if version is None:
+                        data.pop("blender_version")
+                    else:
+                        data["blender_version"] = version
+                    report.write_text(json.dumps(data), encoding="utf-8")
+                with patch("blender_agent.jobs.shutil.which", return_value="/bin/blender"), \
+                     patch("blender_agent.jobs._run_blender", side_effect=fake):
+                    with self.assertRaisesRegex(RuntimeError, "runtime report is missing or unsupported"):
+                        execute("create", workspace=self.root, output="invalid.stl", kind="cube")
+                self.assertFalse((self.root / "invalid.stl").exists())
 
     def test_obj_refuses_missing_material_library(self):
         with patch("blender_agent.jobs.shutil.which", return_value="/bin/blender"), \
@@ -224,6 +243,8 @@ class JobTests(unittest.TestCase):
         self.assertEqual((self.root / "cube.stl").read_bytes(), TRIANGLE_STL)
         self.assertEqual(info["size_bytes"], len(TRIANGLE_STL))
         self.assertEqual(info["geometry_scope"], "pre_export_scene")
+        self.assertEqual(info["blender_version"], "4.5.16")
+        self.assertNotIn("blender_version", info["geometry"])
         self.assertEqual(info["artifact_validation"], "structural_mesh")
         self.assertIn("--disable-autoexec", runner.call_args.args[0])
 

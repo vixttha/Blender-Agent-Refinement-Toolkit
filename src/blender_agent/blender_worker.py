@@ -7,8 +7,23 @@ import json
 import sys
 from pathlib import Path
 
-import bmesh
-import bpy
+# Floors for stable maintained release branches, not a blanket numeric minimum.
+# CVE-2026-119722: https://github.com/advisories/GHSA-xrhr-77c8-rr8q
+RUNTIME_PATCH_FLOORS = {(4, 5): 15, (5, 2): 3}
+RUNTIME_REQUIREMENT = "Use stable Blender 4.5 LTS >= 4.5.15 or 5.2 LTS >= 5.2.3."
+
+
+def require_runtime(version, cycle):
+    """Check Blender's own runtime metadata before reading the job or any asset."""
+    if not isinstance(version, tuple) or len(version) != 3 or any(
+        type(part) is not int or part < 0 for part in version
+    ):
+        raise RuntimeError("Unrecognized Blender runtime version. " + RUNTIME_REQUIREMENT)
+    label = ".".join(str(part) for part in version)
+    floor = RUNTIME_PATCH_FLOORS.get(version[:2])
+    if cycle != "release" or floor is None or version[2] < floor:
+        raise RuntimeError(f"Unsupported Blender runtime {label} ({cycle}). " + RUNTIME_REQUIREMENT)
+    return label
 
 
 def _clear():
@@ -112,8 +127,10 @@ def _require_finished(status, operation):
 
 
 def main():
-    if bpy.app.version < (4, 1, 0):
-        raise RuntimeError("Blender 4.1 or newer is required.")
+    global bpy, bmesh
+    import bpy
+    runtime_version = require_runtime(tuple(bpy.app.version), bpy.app.version_cycle)
+    import bmesh
     arguments = sys.argv[sys.argv.index("--") + 1:]
     if len(arguments) != 1:
         raise ValueError("Expected one job manifest path.")
@@ -138,6 +155,7 @@ def main():
     if geometry["vertices"] < 3 or geometry["faces"] < 1:
         raise ValueError("No mesh faces are available for output.")
     _require_finished(_export(output), "mesh export")
+    geometry["blender_version"] = runtime_version
     Path(job["report"]).write_text(json.dumps(geometry), encoding="utf-8")
 
 
