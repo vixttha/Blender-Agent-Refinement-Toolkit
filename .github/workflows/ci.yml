@@ -110,13 +110,11 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - version: "4.1.0"
-            series: "4.1"
-            sha256: d2ac5390f4a9cb9416c8eb23bdd8fa8e49e68165a889575fd8f56563f5cccaf1
-            mcp-mode: minimum
-          - version: "4.5.0"
+          - version: "4.5.16"
             series: "4.5"
-            sha256: 1188b95cc12321c770b631939f7c25a096910b6f884a990bf9c0f62d52b38aec
+            mcp-mode: minimum
+          - version: "5.2.4"
+            series: "5.2"
             mcp-mode: resolver
     steps:
       - name: Checkout
@@ -132,10 +130,19 @@ jobs:
         env:
           BLENDER_VERSION: ${{ matrix.version }}
           BLENDER_SERIES: ${{ matrix.series }}
-          BLENDER_SHA256: ${{ matrix.sha256 }}
-          SIMULATE_PRIMARY_FAILURE: ${{ github.event_name == 'pull_request' && matrix.version == '4.5.0' }}
+          SIMULATE_PRIMARY_FAILURE: ${{ github.event_name == 'pull_request' && matrix.version == '5.2.4' }}
         run: |
           release="release/Blender${BLENDER_SERIES}/blender-${BLENDER_VERSION}-linux-x64.tar.xz"
+          manifest="release/Blender${BLENDER_SERIES}/blender-${BLENDER_VERSION}.sha256"
+          # Bootstrap official checksums in this draft; pin them before acceptance.
+          if ! curl --fail --location --connect-timeout 10 --max-time 60 --retry 2 --silent --show-error \
+              "https://download.blender.org/$manifest" -o blender.sha256; then
+            curl --fail --location --connect-timeout 10 --max-time 60 --retry 2 --silent --show-error \
+              "https://mirror.blender.org/$manifest" -o blender.sha256
+          fi
+          BLENDER_SHA256=$(awk -v name="${release##*/}" '$2 == name || $2 == "*" name {print $1}' blender.sha256)
+          [[ "$BLENDER_SHA256" =~ ^[0-9a-fA-F]{64}$ ]]
+          printf 'Official Blender checksum: %s %s\n' "${release##*/}" "$BLENDER_SHA256"
           download_primary() {
             if [[ "$SIMULATE_PRIMARY_FAILURE" == true ]]; then
               echo "Simulating a primary Blender download failure to test the mirror."
@@ -163,9 +170,11 @@ jobs:
         shell: bash
         env:
           BLENDER_BIN: ./blender-dist/blender
+          BART_EXPECTED_BLENDER_VERSION: ${{ matrix.version }}
         run: |
           mkdir -p asset-sandbox/out
-          python -m blender_agent --workspace asset-sandbox --blender "$BLENDER_BIN" create cube out/cube.stl --size 1
+          python -m blender_agent --workspace asset-sandbox --blender "$BLENDER_BIN" create cube out/cube.stl --size 1 | tee runtime-result.json
+          python -c 'import json, os; from pathlib import Path; assert json.loads(Path("runtime-result.json").read_text())["blender_version"] == os.environ["BART_EXPECTED_BLENDER_VERSION"]'
           python -m blender_agent --workspace asset-sandbox --blender "$BLENDER_BIN" convert out/cube.stl out/cube.glb
           python -m blender_agent --workspace asset-sandbox --blender "$BLENDER_BIN" convert out/cube.glb out/roundtrip.stl
           python -m blender_agent --workspace asset-sandbox --blender "$BLENDER_BIN" convert out/cube.stl out/cube.obj
@@ -202,10 +211,11 @@ jobs:
         env:
           BLENDER_BIN: ${{ github.workspace }}/blender-dist/blender
           MCP_MODE: ${{ matrix.mcp-mode }}
+          BART_EXPECTED_BLENDER_VERSION: ${{ matrix.version }}
         run: python tests/run_mcp_wheel_smoke.py --blender "$BLENDER_BIN" --mcp-mode "$MCP_MODE"
 
   blender-windows:
-    name: Blender 4.5.0 installed-wheel MCP / Windows
+    name: Blender 4.5.16 installed-wheel MCP / Windows
     runs-on: windows-latest
     timeout-minutes: 15
     steps:
@@ -221,24 +231,35 @@ jobs:
         shell: pwsh
         run: |
           $PSNativeCommandUseErrorActionPreference = $false
-          $release = 'release/Blender4.5/blender-4.5.0-windows-x64.zip'
+          $release = 'release/Blender4.5/blender-4.5.16-windows-x64.zip'
           $archive = Join-Path $env:RUNNER_TEMP 'blender.zip'
           curl.exe --fail --location --retry 2 --silent --show-error "https://download.blender.org/$release" -o $archive
           if ($LASTEXITCODE -ne 0) {
             curl.exe --fail --location --retry 2 --silent --show-error "https://mirror.clarkson.edu/blender/$release" -o $archive
             if ($LASTEXITCODE -ne 0) { throw 'Blender download failed' }
           }
-          $expected = '2ee75e9466d293a784fdf020f60fe1309c1e0610ecf73c64f1fc09b01e5eec56'
+          $manifest = Join-Path $env:RUNNER_TEMP 'blender.sha256'
+          curl.exe --fail --location --retry 2 --silent --show-error 'https://download.blender.org/release/Blender4.5/blender-4.5.16.sha256' -o $manifest
+          if ($LASTEXITCODE -ne 0) {
+            curl.exe --fail --location --retry 2 --silent --show-error 'https://mirror.blender.org/release/Blender4.5/blender-4.5.16.sha256' -o $manifest
+            if ($LASTEXITCODE -ne 0) { throw 'Blender checksum manifest download failed' }
+          }
+          $entries = @(Get-Content $manifest | Where-Object { $_ -match '^[0-9a-fA-F]{64}\s+\*?blender-4\.5\.16-windows-x64\.zip$' })
+          if ($entries.Count -ne 1) { throw 'Missing or ambiguous Blender checksum' }
+          $expected = ($entries[0] -split '\s+')[0]
+          Write-Output "Official Blender checksum: blender-4.5.16-windows-x64.zip $expected"
           if ((Get-FileHash -Algorithm SHA256 $archive).Hash -ne $expected) { throw 'Blender archive checksum mismatch' }
           tar.exe -xf $archive -C $env:RUNNER_TEMP
           if ($LASTEXITCODE -ne 0) { throw 'Blender extraction failed' }
-          $blender = Get-ChildItem (Join-Path $env:RUNNER_TEMP 'blender-4.5.0-windows-x64') -Filter blender.exe
+          $blender = Get-ChildItem (Join-Path $env:RUNNER_TEMP 'blender-4.5.16-windows-x64') -Filter blender.exe
           if (!$blender) { throw 'Blender executable missing after extraction' }
           & $blender.FullName --version
           if ($LASTEXITCODE -ne 0) { throw 'Blender could not start' }
           "BLENDER_BIN=$($blender.FullName)" >> $env:GITHUB_ENV
       - name: Exercise the installed MCP wheel with real Blender
         shell: pwsh
+        env:
+          BART_EXPECTED_BLENDER_VERSION: "4.5.16"
         run: python tests/run_mcp_wheel_smoke.py --blender "$env:BLENDER_BIN"
 
   release-readiness:
