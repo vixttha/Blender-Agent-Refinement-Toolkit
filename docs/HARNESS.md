@@ -38,16 +38,16 @@ Cancelling a queued request prevents it from publishing. An active Blender proce
 
 The optional dependency requires `mcp>=1.30.0,<2`. Public CI on Linux and Windows starts the installed `blender-agent-mcp` command from a separate working directory, initializes a real stdio session, checks each tool's input schema, and verifies workspace isolation and read-only inspection. Individual MCP hosts may require different launch configuration.
 
-The Ubuntu jobs also run all four tools over MCP stdio with Blender 4.1.0 and 4.5.0. They check an STL → GLB → STL cube roundtrip, verify that repair welds a split edge, and confirm that in-place edits and overwrites are rejected while the existing files retain their original bytes.
+The Ubuntu development jobs also run all four tools over MCP stdio with Blender 4.5.16 and 5.2.4. They check an STL → GLB → STL cube roundtrip, verify that repair welds a split edge, and confirm that in-place edits and overwrites are rejected while the existing files retain their original bytes.
 
 | Public check | Configuration | Coverage |
 | --- | --- | --- |
 | Python tests | Python 3.11 and 3.12 on Ubuntu and Windows | Unit and negative-path tests |
 | MCP stdio | Python 3.12 and MCP SDK 1.30.0 on Ubuntu and Windows | Built wheel, installed launchers, discovery, configuration, and inspection |
-| Blender workflow | Python 3.12 on Ubuntu 24.04, with Blender 4.1.0 at the SDK minimum and Blender 4.5.0 using the normal dependency resolver | CLI roundtrips and built-wheel MCP jobs with real Blender |
-| Windows Blender workflow | Python 3.12, SDK minimum, and Blender 4.5.0 on Windows | Installed-wheel MCP jobs with real Blender |
+| Blender workflow | Python 3.12 on Ubuntu 24.04, with Blender 4.5.16 at the SDK minimum and Blender 5.2.4 using the normal dependency resolver | CLI roundtrips and built-wheel MCP jobs with real Blender |
+| Windows Blender workflow | Python 3.12, SDK minimum, and Blender 4.5.16 on Windows | Installed-wheel MCP jobs with real Blender |
 
-CI records the interpreter patch version, platform, and installed MCP dependencies. The public MCP extra declares the SDK v1 API range. Blender 4.1 is the worker's minimum version check. The Windows Blender job verifies 4.5.0. Other versions on Windows, macOS, and named desktop MCP hosts need separate verification. Default output publication requires hard-link support on the workspace filesystem.
+CI records the interpreter patch version, platform, and installed MCP dependencies. The public MCP extra declares the SDK v1 API range. Runtime admission and exact pinned artifacts are described below. Other versions on Windows, macOS, and named desktop MCP hosts need separate verification. Default output publication requires hard-link support on the workspace filesystem.
 
 OBJ exports publish the matching MTL beside the OBJ and return its path in `material_library`. Keep both files together when moving the asset. External texture images remain separate. MCP and default CLI calls protect both destination names. Explicit CLI `--overwrite` applies to both output files while protecting the source model and its material libraries.
 
@@ -57,10 +57,22 @@ When saving a loaded Blender project as a new BLEND file, Blender-Agent Refineme
 
 Repairs process each shared editable mesh datablock once and report that count in `geometry.repaired_mesh_datablocks`. Repair rejects a project that requires editing a read-only mesh datablock.
 
+## Blender runtime policy
+
+The development worker admits stable Blender 4.5 LTS (4.5.15 or later within 4.5) or 5.2 LTS (5.2.3 or later within 5.2) and rejects all other branches and prereleases before reading the job or importing any asset. Successful CLI and MCP Blender results expose the actual `blender_version`. Inspection remains Python-only. This policy addresses [CVE-2026-119722](https://github.com/advisories/GHSA-xrhr-77c8-rr8q); use the latest security patch and a trusted executable, and retain OS isolation for untrusted assets. Runtime admission is distinct from tested compatibility. The historical v0.0.3 release did not enforce this gate.
+
+| CI runtime | Official archive | Pinned SHA-256 |
+| --- | --- | --- |
+| Blender 4.5.16 Linux x64 | [4.5.16 checksums](https://download.blender.org/release/Blender4.5/blender-4.5.16.sha256) | `23432b064977908beb1ab4b7f32f024e7331105c875c187dce002aff84b10c11` |
+| Blender 4.5.16 Windows x64 | [4.5.16 checksums](https://download.blender.org/release/Blender4.5/blender-4.5.16.sha256) | `e258e90a1ebc14798ad65b3426bc5f11f5e0e013541c61cc7c3ee9bbf4ca0ce6` |
+| Blender 5.2.4 Linux x64 | [5.2.4 checksums](https://download.blender.org/release/Blender5.2/blender-5.2.4.sha256) | `2fd14c50987426897ba60237ee996edf2b4151f4b1a72a460ca20be58c1d2d86` |
+
+The digests came from the official release checksum manifests retrieved and verified on the public GitHub runners in [bootstrap run 45338749258](https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/actions/runs/45338749258/attempts/1). That run exercised these exact three archives with real installed-wheel MCP fixtures. The current CI pins the values instead of dynamically trusting a manifest; every download (including a mirror fallback) must match before extraction. The worker reports the actual version and the test suite compares it with the expected matrix version. Check [current CI](https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/actions/workflows/ci.yml) for the exact candidate result.
+
 ## Trust and limits
 
 - Users configure the allowed workspace; keep it away from hostile or untrusted concurrent filesystem writers.
 - Source files are preserved; existing outputs are not overwritten by MCP.
-- Blender 4.1+ is required for 3D operations; Blender 4.5 is exercised in CI.
+- A patched stable LTS runtime from the admitted branches above is required for Blender operations; the official matrix is pinned in CI.
 - Inputs and output are capped in size and errors/streamed logs are bounded.
 - This is not a remote server or OS sandbox, and cannot execute with permissions a hosting harness does not grant.

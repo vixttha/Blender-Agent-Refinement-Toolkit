@@ -5,7 +5,7 @@ description: Run limited mesh cleanup on a copy without guaranteeing print readi
 
 # Mesh repair
 
-Use blender-agent repair SOURCE DESTINATION with Blender 4.1+.
+Use blender-agent repair SOURCE DESTINATION with patched stable Blender 4.5 LTS (4.5.15+) or 5.2 LTS (5.2.3+) within those branches.
 
 The currently supported operation merges near-duplicate vertices at a fixed 0.0001 scene-unit distance, then recalculates face normals. It neither fills holes nor checks wall thickness.
 

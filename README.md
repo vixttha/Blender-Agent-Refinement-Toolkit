@@ -77,7 +77,7 @@ The full result includes the file’s size and SHA-256 digest. The digest depend
 
 ### Run a headless Blender job
 
-Install Blender 4.1 or newer. Put the Blender executable on your command path or pass `--blender` with its path before the operation. Use `./.venv/bin/blender-agent` on macOS or Linux. In PowerShell, use `.\.venv\Scripts\blender-agent.exe` in place of the launcher below.
+Install stable Blender 4.5 LTS (4.5.15 or later within 4.5) or 5.2 LTS (5.2.3 or later within 5.2). Use the latest security patch in an admitted branch from [Blender LTS](https://www.blender.org/download/lts/). The current development source rejects older, other-branch and prerelease runtimes before any Blender operation; the pinned historical v0.0.3 quick start does not enforce that new gate. Always use a patched runtime even with the historical release. Put the Blender executable on your command path or pass `--blender` with its path before the operation. Use `./.venv/bin/blender-agent` on macOS or Linux. In PowerShell, use `.\.venv\Scripts\blender-agent.exe` in place of the launcher below.
 
 ```sh
 ./.venv/bin/blender-agent --workspace readme-demo create cube cube.stl
@@ -150,9 +150,9 @@ Look for the same **3 vertices, 1 face, and bounds** as in the CLI result. The S
 | --- | --- |
 | Python CLI | Python 3.11 and 3.12 on Ubuntu and Windows |
 | Installed-wheel MCP stdio | Linux and Windows, including startup from outside the workspace, tool schemas, and read-only inspection |
-| Blender and MCP | Real Blender 4.1.0 and 4.5.0 on Ubuntu, and real Blender 4.5.0 on Windows. Checks include all four tool calls, geometry, source preservation, and OBJ material re-import. |
+| Blender and MCP | Current development CI matrix: Blender 4.5.16 and 5.2.4 on Ubuntu, and Blender 4.5.16 on Windows. Checks include all four tool calls, geometry, source preservation, and OBJ material re-import. See [exact versions and checksums](docs/HARNESS.md#blender-runtime-policy). |
 
-The application supports Blender 4.1 or later. Named MCP hosts, macOS runners, and additional format combinations need their own checks. [v0.0.3 application checks](https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/actions/runs/44469831772) · [Detailed compatibility and known limits](docs/HARNESS.md)
+The development worker requires stable Blender 4.5 LTS (4.5.15 or later within 4.5) or 5.2 LTS (5.2.3 or later within 5.2). Successful Blender jobs report `blender_version`; Python-only inspection needs no Blender. Other branches and prereleases are rejected. Runtime admission is not a guarantee of compatibility or immunity to future vulnerabilities. Named MCP hosts, macOS runners, and additional format combinations need their own checks. [v0.0.3 application checks](https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/actions/runs/44469831772) · [Detailed compatibility and known limits](docs/HARNESS.md)
 
 ### Working with asset dependencies
 

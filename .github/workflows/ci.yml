@@ -112,9 +112,11 @@ jobs:
         include:
           - version: "4.5.16"
             series: "4.5"
+            sha256: 23432b064977908beb1ab4b7f32f024e7331105c875c187dce002aff84b10c11
             mcp-mode: minimum
           - version: "5.2.4"
             series: "5.2"
+            sha256: 2fd14c50987426897ba60237ee996edf2b4151f4b1a72a460ca20be58c1d2d86
             mcp-mode: resolver
     steps:
       - name: Checkout
@@ -130,19 +132,10 @@ jobs:
         env:
           BLENDER_VERSION: ${{ matrix.version }}
           BLENDER_SERIES: ${{ matrix.series }}
+          BLENDER_SHA256: ${{ matrix.sha256 }}
           SIMULATE_PRIMARY_FAILURE: ${{ github.event_name == 'pull_request' && matrix.version == '5.2.4' }}
         run: |
           release="release/Blender${BLENDER_SERIES}/blender-${BLENDER_VERSION}-linux-x64.tar.xz"
-          manifest="release/Blender${BLENDER_SERIES}/blender-${BLENDER_VERSION}.sha256"
-          # Bootstrap official checksums in this draft; pin them before acceptance.
-          if ! curl --fail --location --connect-timeout 10 --max-time 60 --retry 2 --silent --show-error \
-              "https://download.blender.org/$manifest" -o blender.sha256; then
-            curl --fail --location --connect-timeout 10 --max-time 60 --retry 2 --silent --show-error \
-              "https://mirror.blender.org/$manifest" -o blender.sha256
-          fi
-          BLENDER_SHA256=$(awk -v name="${release##*/}" '$2 == name || $2 == "*" name {print $1}' blender.sha256)
-          [[ "$BLENDER_SHA256" =~ ^[0-9a-fA-F]{64}$ ]]
-          printf 'Official Blender checksum: %s %s\n' "${release##*/}" "$BLENDER_SHA256"
           download_primary() {
             if [[ "$SIMULATE_PRIMARY_FAILURE" == true ]]; then
               echo "Simulating a primary Blender download failure to test the mirror."
@@ -159,6 +152,7 @@ jobs:
               exit 1
             fi
           fi
+          printf 'Pinned Blender archive SHA-256: %s %s\n' "${release##*/}" "$BLENDER_SHA256"
           if ! printf '%s  blender.tar.xz\n' "$BLENDER_SHA256" | sha256sum --check -; then
             echo "::error::Blender archive checksum mismatch."
             exit 1
@@ -238,16 +232,8 @@ jobs:
             curl.exe --fail --location --retry 2 --silent --show-error "https://mirror.clarkson.edu/blender/$release" -o $archive
             if ($LASTEXITCODE -ne 0) { throw 'Blender download failed' }
           }
-          $manifest = Join-Path $env:RUNNER_TEMP 'blender.sha256'
-          curl.exe --fail --location --retry 2 --silent --show-error 'https://download.blender.org/release/Blender4.5/blender-4.5.16.sha256' -o $manifest
-          if ($LASTEXITCODE -ne 0) {
-            curl.exe --fail --location --retry 2 --silent --show-error 'https://mirror.blender.org/release/Blender4.5/blender-4.5.16.sha256' -o $manifest
-            if ($LASTEXITCODE -ne 0) { throw 'Blender checksum manifest download failed' }
-          }
-          $entries = @(Get-Content $manifest | Where-Object { $_ -match '^[0-9a-fA-F]{64}\s+\*?blender-4\.5\.16-windows-x64\.zip$' })
-          if ($entries.Count -ne 1) { throw 'Missing or ambiguous Blender checksum' }
-          $expected = ($entries[0] -split '\s+')[0]
-          Write-Output "Official Blender checksum: blender-4.5.16-windows-x64.zip $expected"
+          $expected = 'e258e90a1ebc14798ad65b3426bc5f11f5e0e013541c61cc7c3ee9bbf4ca0ce6'
+          Write-Output "Pinned Blender archive SHA-256: blender-4.5.16-windows-x64.zip $expected"
           if ((Get-FileHash -Algorithm SHA256 $archive).Hash -ne $expected) { throw 'Blender archive checksum mismatch' }
           tar.exe -xf $archive -C $env:RUNNER_TEMP
           if ($LASTEXITCODE -ne 0) { throw 'Blender extraction failed' }

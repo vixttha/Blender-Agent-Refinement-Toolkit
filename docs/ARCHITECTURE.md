@@ -30,7 +30,7 @@ The file guard does not prevent a hostile process with simultaneous write access
 
 ## Validation and support
 
-Pure Python unit tests run on Windows and Linux with Python 3.11 and 3.12. Optional MCP tests use a real stdio client on both OS families. Blender 4.5.0 integration tests cover creates, repairs, conversion roundtrips, geometry counts, and bounding dimensions on Linux. No compatibility promise is made for Blender builds not tested.
+Pure Python unit tests run on Windows and Linux with Python 3.11 and 3.12. Optional MCP tests use a real stdio client on both OS families. The development CI matrix uses checksum-pinned Blender 4.5.16 and 5.2.4 on Linux and 4.5.16 on Windows, with real installed-wheel MCP fixtures. The branch-aware runtime gate runs before reading the job and returns the effective version in successful CLI/MCP results. See [Harness integration](HARNESS.md#blender-runtime-policy) for exact checks. No compatibility promise is made for Blender builds not tested.
 
 ## Future B+C architecture
 
