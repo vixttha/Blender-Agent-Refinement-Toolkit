@@ -1,16 +1,24 @@
 {
   "schema_version": 1,
-  "active": {
-    "issue": 55,
-    "version": "v0.0.3.2",
-    "phase": "Head",
-    "next_action": "Solo audit PASS: six scoped files, existing exporter defaults and guards preserved; exact PR and merge tree verified; real Blender logs pass. Owner explicitly approved PR #108 merge at ec16f70. Graphify archive is older; no fresh candidate graph claimed. Integrate once and verify main push CI.",
-    "fix_sha": "ec16f705f82ead2734ec9fe6a7eb68f2af62be96",
-    "candidate_sha": "ec16f705f82ead2734ec9fe6a7eb68f2af62be96",
-    "pull_request": 108,
-    "evidence": [
-      "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/actions/runs/45331790849/attempts/1"
-    ]
-  },
-  "history": []
+  "active": null,
+  "history": [
+    {
+      "handoff": {
+        "issue": 55,
+        "version": "v0.0.3.2",
+        "phase": "Head",
+        "next_action": "Integrated and verified on main; close #55. All ten PR and all ten main push jobs passed. Graphify v0.0.3 archive checksum verified, stale for this checkpoint; no live graph run.",
+        "fix_sha": "ec16f705f82ead2734ec9fe6a7eb68f2af62be96",
+        "candidate_sha": "ec16f705f82ead2734ec9fe6a7eb68f2af62be96",
+        "pull_request": 108,
+        "evidence": [
+          "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/actions/runs/45331790849/attempts/1",
+          "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/actions/runs/45334640616/attempts/1"
+        ]
+      },
+      "disposition": "integrated",
+      "decision": "Owner explicitly approved PR #108 as v0.0.3.2. Solo audit passed; exact accepted head and tested merge tree matched integrated main. Post-merge CI passed on exact merged SHA. No package release.",
+      "merged_sha": "88982523f8469b1597efc604257110fee0b1977c"
+    }
+  ]
 }

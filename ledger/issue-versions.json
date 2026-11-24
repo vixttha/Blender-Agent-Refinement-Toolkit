@@ -174,7 +174,7 @@
     {
       "issue": 55,
       "version": "v0.0.3.2",
-      "state": "in_progress",
+      "state": "integrated",
       "acceptance": [
         "Add or reuse a real multi-scene Blender fixture and verify active-scene exported mesh geometry.",
         "Keep whole-file BLEND reporting distinct from mesh export scene counts and artifact validation.",
