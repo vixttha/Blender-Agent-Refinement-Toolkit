@@ -3,11 +3,11 @@
   "active": {
     "issue": 45,
     "version": "v0.0.3.4",
-    "phase": "Worker",
-    "next_action": "Owner requested #45 fix. Verify upstream advisory and official runtime checksums; implement pre-import branch policy and report effective version; reuse public CI. No exploit fixtures, no merge/release without owner approval.",
-    "fix_sha": null,
-    "candidate_sha": null,
-    "pull_request": null,
+    "phase": "Validate",
+    "next_action": "Final candidate pins official SHA-256 digests from bootstrap run 45338749258, which passed all three real patched Blender jobs. Verify exact final PR checkout on public runners, audit runtime gate and docs. No merge until owner approval.",
+    "fix_sha": "4cb5c7a4fb52bbefca1ff1172604d66d67b63ee2",
+    "candidate_sha": "4cb5c7a4fb52bbefca1ff1172604d66d67b63ee2",
+    "pull_request": 110,
     "evidence": []
   },
   "history": [
