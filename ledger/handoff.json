@@ -1,6 +1,15 @@
 {
   "schema_version": 1,
-  "active": null,
+  "active": {
+    "issue": 45,
+    "version": "v0.0.3.4",
+    "phase": "Worker",
+    "next_action": "Owner requested #45 fix. Verify upstream advisory and official runtime checksums; implement pre-import branch policy and report effective version; reuse public CI. No exploit fixtures, no merge/release without owner approval.",
+    "fix_sha": null,
+    "candidate_sha": null,
+    "pull_request": null,
+    "evidence": []
+  },
   "history": [
     {
       "handoff": {

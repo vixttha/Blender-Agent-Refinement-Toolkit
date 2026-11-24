@@ -190,6 +190,16 @@
         "On real public Blender runners, verify that an inactive read-only linked mesh cannot block active-scene repair; verify actual weld and exported artifact.",
         "Reject an in-scope linked read-only mesh for active-scene outputs and whole-file outputs without publication; preserve both project and linked library bytes. Existing CLI/MCP matrix must pass."
       ]
+    },
+    {
+      "issue": 45,
+      "version": "v0.0.3.4",
+      "state": "in_progress",
+      "acceptance": [
+        "Reject affected and unapproved Blender branches and prereleases before importing any asset; enforce branch-aware 4.5 LTS >=4.5.15 and 5.2 LTS >=5.2.3 floors and expose the actual version. Python-only inspection remains unaffected.",
+        "Verify maintained Blender 4.5 LTS on standard public Ubuntu and Windows with benign installed-wheel MCP/CLI fixtures, and verify the admitted 5.2 LTS on Ubuntu. Cover supported and unsupported version fixtures, including pre-import rejection.",
+        "Pin exact verified archive SHA-256 values and align active README, harness, security and skill guidance; retain existing regression coverage, historical release records and separate owner merge authorization."
+      ]
     }
   ]
 }
