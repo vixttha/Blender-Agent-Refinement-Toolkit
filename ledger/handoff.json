@@ -1,6 +1,15 @@
 {
   "schema_version": 1,
-  "active": null,
+  "active": {
+    "issue": 69,
+    "version": "v0.0.3.3",
+    "phase": "Worker",
+    "next_action": "Owner authorized proceeding to #69 after #55 integration. Reuse worker scope from #55 and original linked-library fixture. Target main at 88982523f8469b1597efc604257110fee0b1977c. No #69 merge or release authorized.",
+    "fix_sha": null,
+    "candidate_sha": null,
+    "pull_request": null,
+    "evidence": []
+  },
   "history": [
     {
       "handoff": {

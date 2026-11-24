@@ -180,6 +180,16 @@
         "Keep whole-file BLEND reporting distinct from mesh export scene counts and artifact validation.",
         "Verify exported geometry independently, preserve source files and CLI/MCP compatibility on the existing public Blender matrix."
       ]
+    },
+    {
+      "issue": 69,
+      "version": "v0.0.3.3",
+      "state": "in_progress",
+      "acceptance": [
+        "Align repair scope with existing geometry scope: active scene for STL/OBJ/FBX; file-wide source meshes for BLEND/GLB. Preserve deduplication by mesh datablock and original inputs.",
+        "On real public Blender runners, verify that an inactive read-only linked mesh cannot block active-scene repair; verify actual weld and exported artifact.",
+        "Reject an in-scope linked read-only mesh for active-scene outputs and whole-file outputs without publication; preserve both project and linked library bytes. Existing CLI/MCP matrix must pass."
+      ]
     }
   ]
 }
