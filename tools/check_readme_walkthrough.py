@@ -15,7 +15,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 README = ROOT / "README.md"
 RELEASE_VERSION = "0.0.3"
-RELEASE_SHA = "0fa17fa9ba497696313f6af82ff1a6e43e2de8e7"
+RELEASE_SHA = "7febadd1d18bd15967e9eed6223098268dadfe2f"
 WINDOWS = os.name == "nt"
 
 

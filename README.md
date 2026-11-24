@@ -1,21 +1,20 @@
-<h1 align="center">Blender-Agent Refinement Toolkit</h1>
-<p align="center"><strong>BART</strong></p>
-<p align="center">Give shape to an idea.</p>
+# Blender-Agent Refinement Toolkit
 
-**BART** is the agent for Blender-Agent Refinement Toolkit, an open-source Python toolkit for inspecting, creating, converting, and repairing 3D assets locally. Use the CLI or connect an MCP host. Inspection runs on Python alone. Creation, conversion, and repair run Blender in the background.
+*Give shape to an idea.*
 
-**Pre-alpha v0.0.3.** The quick start uses the tested source revision below. [Published v0.0.3](https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/releases/tag/v0.0.3). [Changelog](CHANGELOG.md) · [GitHub releases](https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/releases)
+**BART** is the agent for Blender-Agent Refinement Toolkit. Use it from a terminal or an MCP host to inspect an asset, create a primitive, convert a file, or repair a mesh on your own machine. Inspection runs with Python alone. Creation, conversion, and repair run Blender in the background.
 
-[Quick start](#quick-start) · [Capabilities](#capabilities) · [MCP setup](#mcp-setup) · [Compatibility](#compatibility) · [Troubleshooting](#troubleshooting)
+The current [v0.0.3 pre-alpha](https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/releases/tag/v0.0.3) is the source for the examples below. See the [changelog](CHANGELOG.md) for work on `main`.
+
+[Quick start](#quick-start) · [MCP setup](#mcp-setup) · [Capabilities](#capabilities) · [Compatibility](#compatibility) · [Contributing](#contributing)
 
 ## Quick start
 
 Use Git and Python 3.11 or newer. The example creates a local `Blender-Agent` folder. Run it from a directory where that name is available.
 
 ```sh
-git clone --no-checkout https://github.com/vixttha/Blender-Agent-Refinement-Toolkit.git Blender-Agent
+git clone -b v0.0.3 --single-branch https://github.com/vixttha/Blender-Agent-Refinement-Toolkit.git Blender-Agent
 cd Blender-Agent
-git checkout --detach 0fa17fa9ba497696313f6af82ff1a6e43e2de8e7
 python -m venv .venv
 ```
 
@@ -69,7 +68,7 @@ The version command reports `0.0.3`. The inspection JSON includes these fields:
 }
 ```
 
-The full result includes the file’s size and SHA-256 digest. The digest depends on the exact file bytes, including line endings. [Public Linux and Windows walkthrough checks](https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/actions/workflows/ci.yml)
+The full result includes the file’s size and SHA-256 digest. The digest depends on the exact file bytes, including line endings.
 
 ![A solid triangle beside a wireframe triangle with three marked vertices](assets/triangle-inspection.webp)
 
@@ -91,21 +90,9 @@ The input stays in place. Choose fresh output names when repeating the commands.
 
 *Concept illustration of cube geometry. The commands above produce files in `readme-demo`.*
 
-## Capabilities
-
-| Operation | Result in v0.0.3 | Needs Blender |
-| --- | --- | --- |
-| Inspect STL or OBJ | Size, digest, bounds, and basic mesh counts | No |
-| Inspect GLB, FBX, or BLEND | File metadata and digest | No |
-| Create | Cube, UV sphere, or cylinder | Yes |
-| Convert | Read and write STL, OBJ, GLB, FBX, and BLEND | Yes |
-| Repair | Weld nearby vertices and recalculate face normals in a separate output | Yes |
-
-Geometry checks establish counts and bounds for the tested samples. Material and animation fidelity, printability, and game-engine readiness require validation in the destination tool. [Architecture](docs/ARCHITECTURE.md) · [Roadmap](docs/ROADMAP.md)
-
 ## MCP setup
 
-Complete the quick start, then install the optional MCP adapter in the same environment. The adapter requires MCP SDK `>=1.30.0,<2`.
+Complete the quick start, then install the optional MCP adapter in the same virtual environment. It requires MCP SDK 1.30 or later in the v1 series. The adapter requires MCP SDK `>=1.30.0,<2`.
 
 ```sh
 .venv/bin/python -m pip install ".[mcp]"
@@ -142,34 +129,39 @@ After connecting, invoke `inspect_model` with the arguments below. The path is r
 }
 ```
 
-Look for the same **3 vertices, 1 face, and bounds** as in the CLI result. The SHA-256 matches the CLI when both inspect the same file. The launcher also exposes `create_primitive`, `convert_model`, and `repair_mesh`. [Harness configuration](docs/HARNESS.md)
+Look for the same **3 vertices, 1 face, and bounds** as in the CLI result. The SHA-256 matches the CLI when both inspect the same file. The launcher also exposes `create_primitive`, `convert_model`, and `repair_mesh`. [Host configuration and troubleshooting](docs/HARNESS.md).
+
+## Capabilities
+
+| Task | What BART returns | Needs Blender |
+| --- | --- | --- |
+| Inspect STL or OBJ | Mesh counts, bounds, file size, and SHA-256 | No |
+| Inspect GLB, FBX, or BLEND | File metadata and SHA-256 | No |
+| Create | A cube, UV sphere, or cylinder written to a new file | Yes |
+| Convert | A new STL, OBJ, GLB, FBX, or BLEND file | Yes |
+| Repair | A new file with nearby vertices welded and face normals recalculated | Yes |
+
+Check materials, textures, animation, and printability in your destination tool. The automated roundtrips verify the tested samples’ geometry. Keep an exported OBJ, its returned `material_library`, and any referenced textures together.
 
 ## Compatibility
 
 | Area | Verified configuration |
 | --- | --- |
-| Python CLI | Python 3.11 and 3.12 on Ubuntu and Windows |
-| Installed-wheel MCP stdio | Linux and Windows, including startup from outside the workspace, tool schemas, and read-only inspection |
-| Blender and MCP | Real Blender 4.1.0 and 4.5.0 on Ubuntu, and real Blender 4.5.0 on Windows. Checks include all four tool calls, geometry, source preservation, and OBJ material re-import. |
+| CLI | Python 3.11 and 3.12 on Linux and Windows |
+| Installed MCP adapter | Launcher, tool schemas, and workspace-bounded inspection on Linux and Windows |
+| Blender workflow | Blender 4.1.0 and 4.5.0 on Ubuntu, and Blender 4.5.0 on Windows. Tests exercise all four MCP tools with real Blender. |
 
-The application supports Blender 4.1 or later. Named MCP hosts, macOS runners, and additional format combinations need their own checks. [v0.0.3 application checks](https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/actions/runs/44469831772) · [Detailed compatibility and known limits](docs/HARNESS.md)
-
-### Working with asset dependencies
-
-- **OBJ export.** Keep the exported OBJ and the returned `material_library` file together. Keep referenced texture images accessible as separate files.
-- **BLEND saves.** Keep referenced images and libraries accessible at their original resolved paths.
-- **Workspace boundary.** Blender can resolve secondary files using its process’s filesystem permissions. Use trusted assets and dependencies. Use OS-level isolation for untrusted workloads.
+The minimum supported Blender version is 4.1. Named MCP clients, macOS, and other format combinations require their own checks. [Release CI](https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/actions/runs/44469831772) · [Detailed harness notes](docs/HARNESS.md)
 
 ## Troubleshooting
 
-- **Blender cannot be found.** Confirm the executable path and pass `--blender` for the CLI or `BLENDER_AGENT_BLENDER` in your host environment.
-- **MCP starts in the wrong directory.** Set `BLENDER_AGENT_WORKSPACE` explicitly to an existing absolute path.
-- **The destination already exists or its parent is missing.** Use a fresh output inside the workspace and create its parent directory before running the job.
-- **Inspect rejects a large STL or OBJ.** Detailed inspection is capped at 128 MiB per input. Blender jobs cap the source and published output at 512 MiB each, with a default timeout of 180 seconds.
-- **The format opens but the result looks different.** Check materials, textures, rigging, and animation in the target tool. The roundtrip checks use a geometric cube fixture.
+- **Blender isn’t found.** Check the executable path. For the CLI, put `--blender` before the operation. For MCP, set `BLENDER_AGENT_BLENDER` in the host environment.
+- **MCP won’t start.** Use the virtual environment’s absolute launcher path and point `BLENDER_AGENT_WORKSPACE` at an existing absolute directory.
+- **The output can’t be written.** Create its parent directory, choose a new filename, and keep the destination inside the workspace.
+- **A BLEND file needs linked assets.** Keep original dependencies accessible. Blender can resolve secondary resource paths using the account’s filesystem permissions. A native BLEND output derived from a third-party project retains the input’s trust level. The worker disables script auto-execution for its session. Treat a later opening as a new trust decision. Use OS-level isolation for untrusted inputs. [Security and reporting](SECURITY.md)
 
-Use a trusted workspace whose files and concurrent writers you control. The worker disables Blender auto-execution. Blender still runs with your account permissions. [Security and reporting](SECURITY.md)
+## Contributing
 
-## Project links
+Start with the [contributing guide](CONTRIBUTING.md), [repository instructions](AGENTS.md), and [architecture](docs/ARCHITECTURE.md). The [public CI workflow](.github/workflows/ci.yml) covers Python, the clean README walkthrough, MCP, and real Blender. Report problems in [GitHub Issues](https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues).
 
-[Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md) · [Issues](https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues) · [Specialist skill guides](skills) · [v0.0.2 documentation graph](https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/blob/5526238af9b510092db336d01b26a42c1ef82548/versions/v0.0.2/README.md) · [MIT License](LICENSE)
+[Changelog](CHANGELOG.md) · [v0.0.3 documentation map](https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/blob/2faf3674a5470c369b30f0d55b6fd5ef56e1e710/versions/v0.0.3/README.md) · [MIT License](LICENSE)
