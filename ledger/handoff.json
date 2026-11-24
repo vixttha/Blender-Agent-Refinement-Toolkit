@@ -3,11 +3,11 @@
   "active": {
     "issue": 55,
     "version": "v0.0.3.2",
-    "phase": "Worker",
-    "next_action": "Owner authorized #55. Reuse PR #81 geometry repair on main; preserve GLB multi-scene export behavior, verify active-scene mesh and whole-file summaries with real Blender. No merge or release.",
-    "fix_sha": null,
-    "candidate_sha": null,
-    "pull_request": null,
+    "phase": "Validate",
+    "next_action": "Verify exact PR #108 checkout(s) using the existing Python, MCP and real Blender matrix. Audit scene/whole-file counts and artifact/source preservation. No integration until owner approval.",
+    "fix_sha": "ec16f705f82ead2734ec9fe6a7eb68f2af62be96",
+    "candidate_sha": "ec16f705f82ead2734ec9fe6a7eb68f2af62be96",
+    "pull_request": 108,
     "evidence": []
   },
   "history": []
