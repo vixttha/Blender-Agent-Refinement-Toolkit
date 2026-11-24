@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.0.3.3 — development checkpoint
+
+- Scope repair to the existing pre-export geometry selection, so inactive linked reference scenes do not prevent active-scene mesh repair. Retain rejection of in-scope read-only meshes and file-wide BLEND/GLB repair (#69).
+
 ## v0.0.3.2 — development checkpoint
 
 - Align pre-export geometry reporting with active-scene STL, OBJ and FBX exports and file-wide BLEND and GLB exports (#55). Preserve GLB multi-scene behavior and distinguish source geometry from artifact validation.
