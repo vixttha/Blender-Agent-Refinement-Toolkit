@@ -61,9 +61,9 @@ def _create(kind, size):
         raise ValueError("Unsupported primitive.")
 
 
-def _repair():
+def _repair(objects):
     repaired = set()
-    for obj in bpy.data.objects:
+    for obj in objects:
         if obj.type != "MESH":
             continue
         mesh = obj.data
@@ -124,14 +124,14 @@ def main():
         _require_finished(_create(job["kind"], float(job["size"])), "primitive creation")
     elif operation in {"convert", "repair"}:
         _require_finished(_import(Path(job["source"])), "mesh import")
-        if operation == "repair":
-            repaired_meshes = _repair()
     else:
         raise ValueError("Unknown operation.")
     output = Path(job["output"])
     # BLEND saves the whole file; GLB preserves the default multi-scene export.
     # Other exporters operate on the active scene. These are pre-export counts.
     objects = bpy.data.objects if output.suffix.lower() in {".blend", ".glb"} else bpy.context.scene.objects
+    if operation == "repair":
+        repaired_meshes = _repair(objects)
     geometry = _geometry(objects)
     if operation == "repair":
         geometry["repaired_mesh_datablocks"] = repaired_meshes

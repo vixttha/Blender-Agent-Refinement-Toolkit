@@ -99,6 +99,39 @@ def verify_multi_scene(project):
         assert (len(obj.data.vertices), len(obj.data.polygons)) == (vertices, faces)
 
 
+def create_repair_scope(project, library, active_linked_project):
+    bpy.ops.wm.read_factory_settings(use_empty=True)
+    bpy.ops.mesh.primitive_cube_add()
+    assert "FINISHED" in bpy.ops.wm.save_as_mainfile(filepath=str(library))
+
+    bpy.ops.wm.read_factory_settings(use_empty=True)
+    active = bpy.context.scene
+    active.name = "Editable Scene"
+    with bpy.data.libraries.load(str(library), link=True) as (source, destination):
+        destination.objects = ["Cube"]
+    linked, = destination.objects
+    other = bpy.data.scenes.new("Reference Scene")
+    other.collection.objects.link(linked)
+
+    mesh = bpy.data.meshes.new("Repair Scope Seam")
+    mesh.from_pydata(
+        [(0, 0, 0), (1, 0, 0), (0, 1, 0), (1.00005, 0, 0), (0.00005, 1, 0), (1, 1, 0)],
+        [], [(0, 1, 2), (3, 5, 4)],
+    )
+    mesh.update()
+    editable = bpy.data.objects.new("Editable Seam", mesh)
+    active.collection.objects.link(editable)
+    assert list(active.objects) == [editable]
+    assert editable.data.library is None and linked.data.library is not None
+    assert not getattr(linked.data, "is_editable", linked.data.library is None)
+    assert "FINISHED" in bpy.ops.wm.save_as_mainfile(filepath=str(project))
+
+    # Same linked mesh, now also part of the active scene; repair must reject it.
+    active.collection.objects.link(linked)
+    assert set(active.objects) == {editable, linked}
+    assert "FINISHED" in bpy.ops.wm.save_as_mainfile(filepath=str(active_linked_project))
+
+
 if __name__ == "__main__":
     action, *paths = sys.argv[sys.argv.index("--") + 1:]
     operations = {
@@ -108,5 +141,6 @@ if __name__ == "__main__":
         "verify_shared": verify_shared,
         "create_multi_scene": create_multi_scene,
         "verify_multi_scene": verify_multi_scene,
+        "create_repair_scope": create_repair_scope,
     }
     operations[action](*(Path(path) for path in paths))

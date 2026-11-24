@@ -250,6 +250,48 @@ async def verify_multi_scene_geometry(session, workspace, blender):
     print("MCP multi-scene geometry: STL/OBJ/FBX active scene; BLEND/GLB file scope; artifacts and source verified.")
 
 
+async def verify_linked_repair_scope(session, workspace, blender):
+    project = workspace / "repair-scope.blend"
+    library = workspace / "repair-library.blend"
+    active_linked = workspace / "repair-active-linked.blend"
+    await run_blender_fixture(blender, "create_repair_scope", project, library, active_linked)
+    original = {path: path.read_bytes() for path in (project, library, active_linked)}
+
+    for extension in ("stl", "obj", "fbx"):
+        output = "scoped-repair." + extension
+        result = await call_tool(session, "repair_mesh", source=project.name, output=output)
+        assert result["ok"] and result["operation"] == "repair", result
+        assert result["geometry_scope"] == "pre_export_scene", result
+        geometry = result["geometry"]
+        assert tuple(geometry[key] for key in ("mesh_objects", "vertices", "faces", "repaired_mesh_datablocks")) == (1, 4, 2, 1), result
+        assert result["size_bytes"] == (workspace / output).stat().st_size > 0, result
+        if extension == "obj":
+            artifact = await call_tool(session, "inspect_model", path=output)
+            assert artifact["vertices"] == 4 and artifact["faces"] == 2, artifact
+        else:
+            if extension == "fbx":
+                await call_tool(session, "convert_model", source=output, output="scoped-fbx.stl")
+                output = "scoped-fbx.stl"
+            artifact = await call_tool(session, "inspect_model", path=output)
+            assert artifact["triangles"] == 2, artifact
+
+    # Active-scene repair must reject a linked mesh inside that scene.
+    # Whole-file repair must reject the same read-only mesh even when inactive.
+    for source, extension in (
+        (active_linked, "stl"), (active_linked, "obj"), (active_linked, "fbx"),
+        (project, "blend"), (project, "glb"),
+    ):
+        output = "rejected-linked." + extension
+        await expect_error(session, "repair_mesh", "Repair requires editable mesh datablocks.",
+                           source=source.name, output=output)
+        assert not (workspace / output).exists(), output
+        if extension == "obj":
+            assert not (workspace / "rejected-linked.mtl").exists()
+
+    assert all(path.read_bytes() == content for path, content in original.items())
+    print("MCP repair scope #69: inactive linked scene excluded; actual weld verified; in-scope read-only repair rejected; source and library bytes unchanged.")
+
+
 async def verify_blender_scheduling(cli, blender, host_directory, workspace, env):
     from mcp import ClientSession, StdioServerParameters
     from mcp import types
@@ -402,6 +444,7 @@ async def smoke(blender):
                     await verify_blend_dependency(session, workspace, blender)
                     await verify_shared_mesh_repair(session, workspace, blender)
                     await verify_multi_scene_geometry(session, workspace, blender)
+                    await verify_linked_repair_scope(session, workspace, blender)
 
         cli_params = StdioServerParameters(
             command=cli, args=["--workspace", str(workspace), "mcp"], cwd=host_directory,
