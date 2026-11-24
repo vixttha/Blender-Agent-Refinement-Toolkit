@@ -1,6 +1,6 @@
 # Product-first issue queue
 
-Live GitHub is authoritative. The snapshot includes 60 issues (42 open, 18 closed). Pull requests excluded. No issue closure, reassignment or new implementation is implied.
+Live GitHub is authoritative. The snapshot includes 61 issues (43 open, 18 closed). Pull requests excluded. No issue closure, reassignment or new implementation is implied.
 
 ## Product / application priority
 
@@ -52,3 +52,5 @@ Live GitHub is authoritative. The snapshot includes 60 issues (42 open, 18 close
 - [#96](https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/96) — [Red Team] Verify wheel hashes in the maintained BART Graphify workflow
 - [#99](https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/99) — [Red Team Dev] Require tracked copied helpers before a BART receipt can attest to its checkout
 - [#106](https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/106) — VIB adoption: verify upstream Graphify evidence anchor before upgrading the installed pin
+
+- [#107](https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/107) — VIB adoption: allow new issue assignments without rewriting the historical issue snapshot

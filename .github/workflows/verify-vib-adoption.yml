@@ -35,7 +35,18 @@ jobs:
           snapshot = json.loads(Path("ledger/github-issues-snapshot.json").read_text())
           assert snapshot["repository"] == ledger["repository"]
           assert len({i["issue"] for i in snapshot["issues"]}) == len(snapshot["issues"])
-          assert all(i["version"] == bindings.get(i["issue"]) for i in snapshot["issues"])
+          # Snapshot entries with no version are historical, not a prohibition on assignment.
+          def snapshot_consistent(snapshot, bindings):
+              return all(i["version"] is None or i["version"] == bindings.get(i["issue"]) for i in snapshot["issues"])
+          assert snapshot_consistent(snapshot, bindings)
+          future = dict(bindings)
+          unassigned = next(i["issue"] for i in snapshot["issues"] if i["version"] is None)
+          future[unassigned] = "v0.0.3.99999"
+          assert snapshot_consistent(snapshot, future)
+          altered = dict(bindings)
+          assigned = next(i["issue"] for i in snapshot["issues"] if i["version"] is not None)
+          altered[assigned] = "v0.0.3.99998"
+          assert not snapshot_consistent(snapshot, altered)
           assert all(session.get_issue(api, state, n)["number"] == n for n in bindings)
           duplicate = copy.deepcopy(ledger)
           duplicate["issues"].append(duplicate["issues"][0])

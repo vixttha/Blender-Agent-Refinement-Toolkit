@@ -12,3 +12,7 @@ Upstream source pin: [8af9508e20fa80e6dc312ededc83f4a8007ecf92](https://github.c
 - `tools/session.py`: `f483fd632e1990ee592448f50e4f35e5e049a401`
 
 Parent product baseline `3e7f9e02e61739825b56bcafecebbd0221cc9657`; fresh independent tree, no product ref updates. The branch commit is the installed revision. Branch-specific validation checks the pin, identity and current state; it is not product acceptance. Existing [BART Graphify archive](https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/tree/graphify-hq) remains separate, not evidence for this installed branch. No new BART asset behavior changed or tested. Solo audit, no independent reviewer claim.
+
+## Installation solo audit
+
+[#107](https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/107) found an initial validator would reject a legitimate new issue assignment because the historical snapshot was unassigned. The repair checks historical non-null mappings and adds positive/negative controls for later assignment and remapping. No package files or product refs changed. Fresh public-runner verification is required for the repaired commit.

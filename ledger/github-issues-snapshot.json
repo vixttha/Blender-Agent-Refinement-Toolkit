@@ -484,6 +484,14 @@
       "category": "supporting",
       "version": null,
       "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/106"
+    },
+    {
+      "issue": 107,
+      "title": "VIB adoption: allow new issue assignments without rewriting the historical issue snapshot",
+      "state": "open",
+      "category": "supporting",
+      "version": null,
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/107"
     }
   ]
 }
