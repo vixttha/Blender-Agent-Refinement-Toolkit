@@ -3,11 +3,11 @@
   "active": {
     "issue": 69,
     "version": "v0.0.3.3",
-    "phase": "Worker",
-    "next_action": "Owner authorized proceeding to #69 after #55 integration. Reuse worker scope from #55 and original linked-library fixture. Target main at 88982523f8469b1597efc604257110fee0b1977c. No #69 merge or release authorized.",
-    "fix_sha": null,
-    "candidate_sha": null,
-    "pull_request": null,
+    "phase": "Validate",
+    "next_action": "Verify exact PR #109 checkout(s) using existing public CI. Audit positive linked-scene repair, actual weld, negative in-scope linked mesh and source/library preservation. No merge until owner approval.",
+    "fix_sha": "4e47aba6eec452865e1ec9e85ffab535c8ebb0d4",
+    "candidate_sha": "4e47aba6eec452865e1ec9e85ffab535c8ebb0d4",
+    "pull_request": 109,
     "evidence": []
   },
   "history": [
