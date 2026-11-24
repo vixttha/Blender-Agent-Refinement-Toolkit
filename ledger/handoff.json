@@ -3,12 +3,14 @@
   "active": {
     "issue": 45,
     "version": "v0.0.3.4",
-    "phase": "Validate",
-    "next_action": "Final candidate pins official SHA-256 digests from bootstrap run 45338749258, which passed all three real patched Blender jobs. Verify exact final PR checkout on public runners, audit runtime gate and docs. No merge until owner approval.",
+    "phase": "Internal Auditor",
+    "next_action": "Final checksum-pinned candidate passed 10/10 public CI, including 4.5.16 Ubuntu/Windows and 5.2.4 Ubuntu. Verify advisory floors, exact checkout, pre-import rejection, runtime result and documentation. Preserve bootstrap evidence separately.",
     "fix_sha": "4cb5c7a4fb52bbefca1ff1172604d66d67b63ee2",
     "candidate_sha": "4cb5c7a4fb52bbefca1ff1172604d66d67b63ee2",
     "pull_request": 110,
-    "evidence": []
+    "evidence": [
+      "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/actions/runs/45339017170/attempts/1"
+    ]
   },
   "history": [
     {
