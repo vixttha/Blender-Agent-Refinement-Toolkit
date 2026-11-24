@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "package": "Version-Issues-Hub",
+  "source_repository": "vixttha/Version-Issues-Hub",
+  "source_sha": "8af9508e20fa80e6dc312ededc83f4a8007ecf92",
+  "target_repository": "vixttha/Blender-Agent-Refinement-Toolkit",
+  "target_repository_id": 1463482830,
+  "product_branch": "main",
+  "product_baseline_sha": "3e7f9e02e61739825b56bcafecebbd0221cc9657",
+  "install_branch": "Version-Issues-Hub",
+  "baseline_version": "v0.0.3",
+  "target_version": "v0.0.4",
+  "enforcement": "disabled",
+  "package_files_sha256": {
+    "AGENTS.md": "983706750c726cef35230038f6c2a0782c27e03f0738fe3debbff6712c6ed33a",
+    "GATE.md": "bfde5dedebf0b985b1de9b48fe9df503141de53798dfef44f39c8044a4f2946a",
+    "README.md": "e3e1aceee8ae40439643f826f6286b46526c3b81fa0e95b8f5702224f43b2421",
+    "WORKFLOW.md": "31abaa8479a91835d6493f2e07c3e57f7d01976d862387f4483e0910f0dbc76f",
+    "tools/checkpoint.py": "f444c18b83191edc7bd8a07b9b0852699467a169416443a6ca72c3022b426a25",
+    "tools/gate.py": "c98e36fcaf7fdcf46d5624391a10bdd7223df2be13865c392fb3e2e7c17f3bd0",
+    "tools/install.py": "31c5b1d753a8fad74366af4845b1775eec5a3f47061835044c1fac1be9302ea0",
+    "tools/session.py": "ca9c90f469e0c4ef6065beb7ffb842ac3d932dc1f3095f8e9e103de225e7c58a"
+  }
+}

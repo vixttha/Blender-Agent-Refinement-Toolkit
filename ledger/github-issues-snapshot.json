@@ -1,0 +1,489 @@
+{
+  "schema_version": 1,
+  "repository": "vixttha/Blender-Agent-Refinement-Toolkit",
+  "source": "GitHub Issues API, state=all, all pages (PRs excluded)",
+  "snapshot_date": "2026-11-24",
+  "product_sha": "3e7f9e02e61739825b56bcafecebbd0221cc9657",
+  "issues": [
+    {
+      "issue": 11,
+      "title": "Prevent successful OBJ exports from referencing discarded material files",
+      "state": "closed",
+      "category": "supporting",
+      "version": "v0.0.2.1",
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/11"
+    },
+    {
+      "issue": 12,
+      "title": "Require explicit MCP workspace configuration and honor supported CLI settings",
+      "state": "closed",
+      "category": "supporting",
+      "version": "v0.0.2.3",
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/12"
+    },
+    {
+      "issue": 13,
+      "title": "Stream ASCII STL inspection and clarify Blender export size limits",
+      "state": "closed",
+      "category": "supporting",
+      "version": "v0.0.2.5",
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/13"
+    },
+    {
+      "issue": 14,
+      "title": "Reject empty mesh results and distinguish scene geometry from export validation",
+      "state": "open",
+      "category": "product",
+      "version": "v0.0.2.7",
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/14"
+    },
+    {
+      "issue": 15,
+      "title": "Make the tested Blender, Python, and MCP compatibility matrix reproducible",
+      "state": "open",
+      "category": "product",
+      "version": "v0.0.2.12",
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/15"
+    },
+    {
+      "issue": 16,
+      "title": "Update the public README to point to the published release and current CI",
+      "state": "closed",
+      "category": "supporting",
+      "version": null,
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/16"
+    },
+    {
+      "issue": 18,
+      "title": "Resolve the configured Blender executable before switching working directories",
+      "state": "closed",
+      "category": "supporting",
+      "version": "v0.0.2.2",
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/18"
+    },
+    {
+      "issue": 19,
+      "title": "Preserve linked assets when publishing a Blender project from staging",
+      "state": "open",
+      "category": "product",
+      "version": "v0.0.2.10",
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/19"
+    },
+    {
+      "issue": 20,
+      "title": "Define the Blender workspace policy for linked asset dependencies",
+      "state": "open",
+      "category": "product",
+      "version": "v0.0.2.9",
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/20"
+    },
+    {
+      "issue": 21,
+      "title": "Keep the MCP stdio session responsive during Blender jobs",
+      "state": "closed",
+      "category": "supporting",
+      "version": "v0.0.2.8",
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/21"
+    },
+    {
+      "issue": 22,
+      "title": "Repair each shared Blender mesh datablock once",
+      "state": "closed",
+      "category": "supporting",
+      "version": "v0.0.2.11",
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/22"
+    },
+    {
+      "issue": 23,
+      "title": "Recover interrupted OBJ and MTL publication without discarding existing assets",
+      "state": "open",
+      "category": "product",
+      "version": "v0.0.2.13",
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/23"
+    },
+    {
+      "issue": 24,
+      "title": "Accept valid continued face records in OBJ inspection",
+      "state": "closed",
+      "category": "supporting",
+      "version": "v0.0.2.6",
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/24"
+    },
+    {
+      "issue": 25,
+      "title": "Align the setuptools minimum with SPDX license metadata",
+      "state": "closed",
+      "category": "supporting",
+      "version": "v0.0.2.4",
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/25"
+    },
+    {
+      "issue": 26,
+      "title": "Reconcile the README HQ draft conflict with the published archive",
+      "state": "closed",
+      "category": "supporting",
+      "version": null,
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/26"
+    },
+    {
+      "issue": 27,
+      "title": "Refresh Graphify candidate validation against the current Graphify HQ base",
+      "state": "closed",
+      "category": "supporting",
+      "version": null,
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/27"
+    },
+    {
+      "issue": 28,
+      "title": "Include tracked file modes in Code Stack archive identity checks",
+      "state": "open",
+      "category": "supporting",
+      "version": null,
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/28"
+    },
+    {
+      "issue": 29,
+      "title": "Tie future release publication jobs to an explicit approval for the target SHA",
+      "state": "open",
+      "category": "release/security",
+      "version": "v0.0.2.19",
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/29"
+    },
+    {
+      "issue": 31,
+      "title": "Fix MCP startup at the declared SDK minimum",
+      "state": "open",
+      "category": "product",
+      "version": "v0.0.2.17",
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/31"
+    },
+    {
+      "issue": 32,
+      "title": "Restore mesh repair on the documented Blender 4.1 minimum",
+      "state": "closed",
+      "category": "supporting",
+      "version": "v0.0.2.16",
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/32"
+    },
+    {
+      "issue": 33,
+      "title": "Fix Windows Blender job timeouts over MCP stdio",
+      "state": "closed",
+      "category": "supporting",
+      "version": "v0.0.2.18",
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/33"
+    },
+    {
+      "issue": 34,
+      "title": "Prevent a cancelled MCP Blender request from publishing output",
+      "state": "closed",
+      "category": "supporting",
+      "version": "v0.0.2.15",
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/34"
+    },
+    {
+      "issue": 35,
+      "title": "Protect source MTL files referenced by continued OBJ directives",
+      "state": "closed",
+      "category": "supporting",
+      "version": "v0.0.2.14",
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/35"
+    },
+    {
+      "issue": 36,
+      "title": "Reconcile the checkpoint PR with the repaired OBJ base",
+      "state": "closed",
+      "category": "supporting",
+      "version": null,
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/36"
+    },
+    {
+      "issue": 37,
+      "title": "Keep Blender CI runnable when the primary download endpoint returns HTTP 403",
+      "state": "closed",
+      "category": "supporting",
+      "version": "v0.0.2.20",
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/37"
+    },
+    {
+      "issue": 45,
+      "title": "Validate and enforce a patched Blender runtime for third-party projects",
+      "state": "open",
+      "category": "product",
+      "version": null,
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/45"
+    },
+    {
+      "issue": 46,
+      "title": "Add redacted job diagnostics for Blender execution and recovery",
+      "state": "open",
+      "category": "product",
+      "version": null,
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/46"
+    },
+    {
+      "issue": 47,
+      "title": "Verify active MCP cancellation through real Blender on Windows",
+      "state": "open",
+      "category": "product",
+      "version": null,
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/47"
+    },
+    {
+      "issue": 48,
+      "title": "Document Blender incident response and verify private reporting intake",
+      "state": "open",
+      "category": "product",
+      "version": null,
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/48"
+    },
+    {
+      "issue": 49,
+      "title": "Raise the setuptools build minimum to a patched version",
+      "state": "open",
+      "category": "product",
+      "version": null,
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/49"
+    },
+    {
+      "issue": 50,
+      "title": "Enforce the existing PR and CI policy on main",
+      "state": "open",
+      "category": "release/security",
+      "version": null,
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/50"
+    },
+    {
+      "issue": 51,
+      "title": "Require the expected CI jobs in the release approval check",
+      "state": "open",
+      "category": "release/security",
+      "version": null,
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/51"
+    },
+    {
+      "issue": 52,
+      "title": "Archive sanitized test and release approval receipts",
+      "state": "open",
+      "category": "release/security",
+      "version": null,
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/52"
+    },
+    {
+      "issue": 53,
+      "title": "Make interrupted prerelease publication recoverable",
+      "state": "open",
+      "category": "release/security",
+      "version": null,
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/53"
+    },
+    {
+      "issue": 54,
+      "title": "Use reviewed project-focused prerelease notes",
+      "state": "closed",
+      "category": "supporting",
+      "version": null,
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/54"
+    },
+    {
+      "issue": 55,
+      "title": "Align geometry reporting with multi-scene Blender projects",
+      "state": "open",
+      "category": "product",
+      "version": "v0.0.3.2",
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/55"
+    },
+    {
+      "issue": 56,
+      "title": "Explain the trust boundary for exported BLEND projects",
+      "state": "open",
+      "category": "product",
+      "version": null,
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/56"
+    },
+    {
+      "issue": 62,
+      "title": "Rebrand as Blender-Agent Refinement Toolkit and lock BART as the agent name",
+      "state": "open",
+      "category": "branding",
+      "version": "v0.0.3.1",
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/62"
+    },
+    {
+      "issue": 64,
+      "title": "Reject malformed ASCII STL loop framing during inspection",
+      "state": "open",
+      "category": "product",
+      "version": null,
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/64"
+    },
+    {
+      "issue": 65,
+      "title": "Accept trailing OBJ face comments in structural inspection",
+      "state": "open",
+      "category": "product",
+      "version": null,
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/65"
+    },
+    {
+      "issue": 66,
+      "title": "Make Graphify archive verification tolerate the repository rename",
+      "state": "open",
+      "category": "supporting",
+      "version": null,
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/66"
+    },
+    {
+      "issue": 68,
+      "title": "Handle or clearly report non-UTF-8 comments in OBJ inspection",
+      "state": "open",
+      "category": "product",
+      "version": null,
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/68"
+    },
+    {
+      "issue": 69,
+      "title": "Scope mesh repair to exported geometry when an inactive scene has linked data",
+      "state": "open",
+      "category": "product",
+      "version": null,
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/69"
+    },
+    {
+      "issue": 75,
+      "title": "[Graphify HQ] Keep graph and receipt consistent when writing an evidence map fails",
+      "state": "open",
+      "category": "supporting",
+      "version": null,
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/75"
+    },
+    {
+      "issue": 82,
+      "title": "v0.0.4.2 — Record the observed BLENDER-001 failure in the Vault plan",
+      "state": "open",
+      "category": "supporting",
+      "version": null,
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/82"
+    },
+    {
+      "issue": 83,
+      "title": "[Red Team] Publish the current passing BLENDER-001 result in the Vault plan",
+      "state": "open",
+      "category": "supporting",
+      "version": null,
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/83"
+    },
+    {
+      "issue": 84,
+      "title": "[Red Team] Distinguish truncated PR history from an absent historical Graphify source",
+      "state": "open",
+      "category": "supporting",
+      "version": null,
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/84"
+    },
+    {
+      "issue": 85,
+      "title": "[Red Team] Preserve existing Graphify evidence when the recovery journal is incomplete",
+      "state": "open",
+      "category": "supporting",
+      "version": null,
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/85"
+    },
+    {
+      "issue": 86,
+      "title": "[Blue Team] Record early failures and blocked cases in BART's Vault summary",
+      "state": "open",
+      "category": "supporting",
+      "version": null,
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/86"
+    },
+    {
+      "issue": 87,
+      "title": "Use physical source lines and ordinary Git files for Graphify citations",
+      "state": "open",
+      "category": "supporting",
+      "version": null,
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/87"
+    },
+    {
+      "issue": 88,
+      "title": "[Purple Team] Use the same file-type rules for Graphify publication and archive readback",
+      "state": "open",
+      "category": "supporting",
+      "version": null,
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/88"
+    },
+    {
+      "issue": 89,
+      "title": "Update BART’s maintained Graphify HQ kit references to Veraphifiy",
+      "state": "open",
+      "category": "supporting",
+      "version": null,
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/89"
+    },
+    {
+      "issue": 90,
+      "title": "[White Team] Enforce BART's public-only runner policy at job admission",
+      "state": "open",
+      "category": "release/security",
+      "version": null,
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/90"
+    },
+    {
+      "issue": 91,
+      "title": "[Black Team] Disable Git credential persistence for Python and Blender roundtrip jobs",
+      "state": "open",
+      "category": "product",
+      "version": null,
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/91"
+    },
+    {
+      "issue": 92,
+      "title": "[Full-stack audit] Reject non-finite binary STL facet normals during structural inspection",
+      "state": "open",
+      "category": "product",
+      "version": null,
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/92"
+    },
+    {
+      "issue": 93,
+      "title": "Staging can accept a cached source commit that is absent from the requested origin",
+      "state": "open",
+      "category": "supporting",
+      "version": null,
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/93"
+    },
+    {
+      "issue": 94,
+      "title": "[Red Team] Verify exact Graphify MCP feature targets before accepting candidate maps",
+      "state": "open",
+      "category": "supporting",
+      "version": null,
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/94"
+    },
+    {
+      "issue": 96,
+      "title": "[Red Team] Verify wheel hashes in the maintained BART Graphify workflow",
+      "state": "open",
+      "category": "supporting",
+      "version": null,
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/96"
+    },
+    {
+      "issue": 99,
+      "title": "[Red Team Dev] Require tracked copied helpers before a BART receipt can attest to its checkout",
+      "state": "open",
+      "category": "supporting",
+      "version": null,
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/99"
+    },
+    {
+      "issue": 106,
+      "title": "VIB adoption: verify upstream Graphify evidence anchor before upgrading the installed pin",
+      "state": "open",
+      "category": "supporting",
+      "version": null,
+      "url": "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/issues/106"
+    }
+  ]
+}

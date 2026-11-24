@@ -1,0 +1,49 @@
+name: Verify BART VIB adoption
+on:
+  push:
+    branches: [Version-Issues-Hub]
+permissions:
+  contents: read
+jobs:
+  verify:
+    if: github.event.repository.visibility == 'public'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
+        with:
+          python-version: '3.12'
+      - name: Validate pinned package and adopter state
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python -B - <<'PY'
+          import json, os, copy
+          from pathlib import Path
+          from tools import install, session, checkpoint
+          api = install.GitHub(os.environ["GH_TOKEN"])
+          state = session.load(api, os.environ["GITHUB_REPOSITORY"], os.environ["GITHUB_SHA"])
+          ledger = state["ledger"]
+          assert state["manifest"]["enforcement"] == "disabled"
+          assert state["manifest"]["target_repository"] == os.environ["GITHUB_REPOSITORY"]
+          assert state["manifest"]["product_branch"] == "main"
+          assert state["manifest"]["source_repository"] == install.SOURCE
+          bindings = checkpoint.bindings(ledger)
+          snapshot = json.loads(Path("ledger/github-issues-snapshot.json").read_text())
+          assert snapshot["repository"] == ledger["repository"]
+          assert len({i["issue"] for i in snapshot["issues"]}) == len(snapshot["issues"])
+          assert all(i["version"] == bindings.get(i["issue"]) for i in snapshot["issues"])
+          assert all(session.get_issue(api, state, n)["number"] == n for n in bindings)
+          duplicate = copy.deepcopy(ledger)
+          duplicate["issues"].append(duplicate["issues"][0])
+          try:
+              checkpoint.bindings(duplicate)
+          except ValueError:
+              pass
+          else:
+              raise AssertionError("Duplicate assignment accepted")
+          print("Pinned VIB package and host-local state verified; no product acceptance or merge enforcement claimed.")
+          PY

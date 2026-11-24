@@ -1,0 +1,185 @@
+{
+  "schema_version": 1,
+  "repository": "vixttha/Blender-Agent-Refinement-Toolkit",
+  "issues": [
+    {
+      "issue": 11,
+      "version": "v0.0.2.1",
+      "state": "integrated",
+      "acceptance": [
+        "Preserve OBJ and matching material library; verify material roundtrip and collision protection."
+      ]
+    },
+    {
+      "issue": 18,
+      "version": "v0.0.2.2",
+      "state": "integrated",
+      "acceptance": [
+        "Resolve configured Blender executable before changing working directory."
+      ]
+    },
+    {
+      "issue": 12,
+      "version": "v0.0.2.3",
+      "state": "integrated",
+      "acceptance": [
+        "Require explicit MCP workspace and respect CLI configuration."
+      ]
+    },
+    {
+      "issue": 25,
+      "version": "v0.0.2.4",
+      "state": "integrated",
+      "acceptance": [
+        "Build a licensed wheel at the required setuptools minimum."
+      ]
+    },
+    {
+      "issue": 13,
+      "version": "v0.0.2.5",
+      "state": "integrated",
+      "acceptance": [
+        "Stream ASCII STL inspection and clarify export size bounds."
+      ]
+    },
+    {
+      "issue": 24,
+      "version": "v0.0.2.6",
+      "state": "integrated",
+      "acceptance": [
+        "Accept continued OBJ polygons and reject invalid continuations."
+      ]
+    },
+    {
+      "issue": 14,
+      "version": "v0.0.2.7",
+      "state": "assigned",
+      "acceptance": [
+        "Reject empty mesh output and distinguish scene and artifact validation."
+      ]
+    },
+    {
+      "issue": 21,
+      "version": "v0.0.2.8",
+      "state": "integrated",
+      "acceptance": [
+        "Keep MCP responsive during Blender jobs."
+      ]
+    },
+    {
+      "issue": 20,
+      "version": "v0.0.2.9",
+      "state": "assigned",
+      "acceptance": [
+        "Document secondary asset workspace policy and disable automatic script execution."
+      ]
+    },
+    {
+      "issue": 19,
+      "version": "v0.0.2.10",
+      "state": "assigned",
+      "acceptance": [
+        "Preserve linked resources when publishing Blender projects."
+      ]
+    },
+    {
+      "issue": 22,
+      "version": "v0.0.2.11",
+      "state": "integrated",
+      "acceptance": [
+        "Repair shared mesh datablocks once; preserve instance transforms, materials and UVs."
+      ]
+    },
+    {
+      "issue": 15,
+      "version": "v0.0.2.12",
+      "state": "assigned",
+      "acceptance": [
+        "Verify clean wheel MCP compatibility and record platform details."
+      ]
+    },
+    {
+      "issue": 23,
+      "version": "v0.0.2.13",
+      "state": "assigned",
+      "acceptance": [
+        "Recover interrupted OBJ/MTL publication without discarding existing assets."
+      ]
+    },
+    {
+      "issue": 35,
+      "version": "v0.0.2.14",
+      "state": "integrated",
+      "acceptance": [
+        "Protect source MTL files named by continued OBJ directives."
+      ]
+    },
+    {
+      "issue": 34,
+      "version": "v0.0.2.15",
+      "state": "integrated",
+      "acceptance": [
+        "Cancel queued or active MCP jobs before publication; preserve subsequent request."
+      ]
+    },
+    {
+      "issue": 32,
+      "version": "v0.0.2.16",
+      "state": "integrated",
+      "acceptance": [
+        "Restore repair on Blender 4.1 and validate installed-wheel fixture."
+      ]
+    },
+    {
+      "issue": 31,
+      "version": "v0.0.2.17",
+      "state": "assigned",
+      "acceptance": [
+        "Raise MCP SDK minimum and verify clean installs."
+      ]
+    },
+    {
+      "issue": 33,
+      "version": "v0.0.2.18",
+      "state": "integrated",
+      "acceptance": [
+        "Detach Blender stdin and verify Windows installed-wheel MCP."
+      ]
+    },
+    {
+      "issue": 29,
+      "version": "v0.0.2.19",
+      "state": "assigned",
+      "acceptance": [
+        "Bind explicit approval to final tag, SHA and successful exact-commit CI."
+      ]
+    },
+    {
+      "issue": 37,
+      "version": "v0.0.2.20",
+      "state": "integrated",
+      "acceptance": [
+        "Verify pinned Blender download fallback and distinguish checksum failure."
+      ]
+    },
+    {
+      "issue": 62,
+      "version": "v0.0.3.1",
+      "state": "assigned",
+      "acceptance": [
+        "Preserve locked product name, agent name, brand line, compatible identifiers and historical archives.",
+        "Reconcile remaining active ChatGPT instruction branding against the saved project settings; retain all existing integration receipts."
+      ]
+    },
+    {
+      "issue": 55,
+      "version": "v0.0.3.2",
+      "state": "assigned",
+      "acceptance": [
+        "Add or reuse a real multi-scene Blender fixture and verify active-scene exported mesh geometry.",
+        "Keep whole-file BLEND reporting distinct from mesh export scene counts and artifact validation.",
+        "Verify exported geometry independently, preserve source files and CLI/MCP compatibility on the existing public Blender matrix."
+      ]
+    }
+  ]
+}

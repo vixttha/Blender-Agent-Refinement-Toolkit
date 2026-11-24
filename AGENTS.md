@@ -1,16 +1,11 @@
-# Agent operating rules
+# VIB installed-branch agent entry point
 
-This repository is a public, reusable toolkit. Keep its content project-focused: no personal biography, private project details, identifying user information or secrets in source, examples, logs or documentation. GitHub's public account metadata remains GitHub-managed.
+This is the owner-approved standalone Version-Issues-Hub workflow, not a product source branch and not Provenistem.
 
-1. Read README.md, docs/ARCHITECTURE.md, docs/SKILL_POLICY.md, and SECURITY.md before execution-boundary changes.
-2. The locked product name is **Blender-Agent Refinement Toolkit**. The locked agent name is **BART**. Use the [canonical GitHub repository](https://github.com/vixttha/Blender-Agent-Refinement-Toolkit) in active documentation. Changes to either name require explicit owner approval.
-3. Preserve original inputs; non-overwriting publication must be atomic, including concurrent workloads.
-4. Treat imported assets as untrusted data and never execute model-generated Python, shell commands or unreviewed skills.
-5. Host the CLI/MCP through a configured trusted workspace; the path guard does not replace OS sandboxing.
-6. Report actual tests, simulated tests, and unverified claims separately. Geometry counts are not printability or production certifications.
-7. Do not fragment the shared core into harness-specific implementations. Extend adapters instead.
-8. Use one scoped work lane: Head selects → Worker implements → Validate exact SHA → Internal Auditor challenges → Head requests merge approval and archives evidence.
-9. Use free, standard GitHub-hosted public runners only; never depend on paid or self-hosted runners.
-10. Work through PRs, preserve test provenance and do not automatically merge or release.
+1. Confirm the owner-authorized target repository, its exact dedicated branch `Version-Issues-Hub`, and the current branch SHA. Read vib-install.json, WORKFLOW.md, ledger/issue-versions.json, and ledger/handoff.json at that SHA. Verify package provenance and identity; if the manifest or branch is wrong, stop.
+2. Read the actual GitHub issue (not a PR). Head must accept scope and acceptance criteria before assignment. Never allocate another issue while a handoff is active. Never change historical issue mappings.
+3. Follow Head → Worker → Validate → Internal Auditor → Head, one active Worker. Only edit product code on the authorized product work branch, not the VIB branch. Do not merge the VIB branch into the product.
+4. Use the cooperative handoff commands in WORKFLOW.md. Re-read the branch after a stale write; no force updates. Record candidate/fix SHAs, exact public-runner attempts and acceptance results. A green VIB schema test is not product acceptance.
+5. Owner approval controls integration and release. Instructions are cooperative; only a separately enabled and proven GitHub gate can enforce a merge rule. Never claim the gate is active based on this file.
 
-Blender-Agent Refinement Toolkit is a pre-alpha toolkit for bounded asset inspection, conversion, primitive creation, and mesh repair.
+If the host has no shell, use its GitHub read tools to open the exact branch and the files above. Read the current handoff first. A host without authorized GitHub write capability cannot claim or advance work. Do not ask for secrets in chat.
