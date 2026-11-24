@@ -204,6 +204,52 @@ async def verify_shared_mesh_repair(session, workspace, blender):
     print("MCP shared repair: one datablock repaired; both transforms, UVs, and material survived.")
 
 
+async def verify_multi_scene_geometry(session, workspace, blender):
+    source = workspace / "two-scenes.blend"
+    await run_blender_fixture(blender, "create_multi_scene", source)
+    original = source.read_bytes()
+
+    def counts(result, scope, expected):
+        assert result["ok"] and result["operation"] == "convert", result
+        assert result["geometry_scope"] == scope, result
+        geometry = result["geometry"]
+        assert tuple(geometry[key] for key in ("mesh_objects", "vertices", "faces")) == expected, result
+        assert result["size_bytes"] == (workspace / result["output"]).stat().st_size > 0, result
+
+    for extension in ("stl", "obj", "fbx"):
+        output = "active-scene." + extension
+        result = await call_tool(session, "convert_model", source=source.name, output=output)
+        counts(result, "pre_export_scene", (1, 3, 1))
+        assert Path(result["output"]) == Path(output), result
+        if extension == "stl":
+            artifact = await call_tool(session, "inspect_model", path=output)
+            assert result["artifact_validation"] == "structural_mesh", result
+            assert artifact["triangles"] == 1, artifact
+        elif extension == "obj":
+            artifact = await call_tool(session, "inspect_model", path=output)
+            assert result["artifact_validation"] == "structural_mesh", result
+            assert artifact["vertices"] == 3 and artifact["faces"] == 1, artifact
+        else:
+            await call_tool(session, "convert_model", source=output, output="fbx-scene.stl")
+            artifact = await call_tool(session, "inspect_model", path="fbx-scene.stl")
+            assert artifact["triangles"] == 1, artifact
+
+    result = await call_tool(session, "convert_model", source=source.name, output="all-scenes.blend")
+    counts(result, "pre_export_file", (2, 11, 7))
+    await run_blender_fixture(blender, "verify_multi_scene", workspace / "all-scenes.blend")
+
+    result = await call_tool(session, "convert_model", source=source.name, output="all-scenes.glb")
+    counts(result, "pre_export_file", (2, 11, 7))
+    glb = (workspace / "all-scenes.glb").read_bytes()
+    size, kind = struct.unpack_from("<I4s", glb, 12)
+    assert glb[:4] == b"glTF" and kind == b"JSON"
+    document = json.loads(glb[20:20 + size])
+    assert {scene["name"] for scene in document["scenes"]} == {"Active Triangle", "Secondary Cube"}, document
+    assert {mesh["name"] for mesh in document["meshes"]} == {"Triangle", "Cube"}, document
+    assert source.read_bytes() == original, "The source blend file changed"
+    print("MCP multi-scene geometry: STL/OBJ/FBX active scene; BLEND/GLB file scope; artifacts and source verified.")
+
+
 async def verify_blender_scheduling(cli, blender, host_directory, workspace, env):
     from mcp import ClientSession, StdioServerParameters
     from mcp import types
@@ -355,6 +401,7 @@ async def smoke(blender):
                     await reject_faceless_output(session, workspace)
                     await verify_blend_dependency(session, workspace, blender)
                     await verify_shared_mesh_repair(session, workspace, blender)
+                    await verify_multi_scene_geometry(session, workspace, blender)
 
         cli_params = StdioServerParameters(
             command=cli, args=["--workspace", str(workspace), "mcp"], cwd=host_directory,

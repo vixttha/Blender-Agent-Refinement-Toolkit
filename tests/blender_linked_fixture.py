@@ -69,7 +69,44 @@ def verify_shared(project):
     assert all(tuple(loop.vector) == (0.25, 0.75) for loop in mesh.uv_layers["Fixture UV"].uv)
 
 
+def create_multi_scene(project):
+    active = bpy.context.scene
+    active.name = "Active Triangle"
+    secondary = bpy.data.scenes.new("Secondary Cube")
+    cube = bpy.data.objects["Cube"]
+    previous_collections = list(cube.users_collection)
+    secondary.collection.objects.link(cube)
+    for collection in previous_collections:
+        collection.objects.unlink(cube)
+
+    mesh = bpy.data.meshes.new("Triangle")
+    mesh.from_pydata([(0, 0, 0), (1, 0, 0), (0, 1, 0)], [], [(0, 1, 2)])
+    mesh.update()
+    triangle = bpy.data.objects.new("Triangle", mesh)
+    active.collection.objects.link(triangle)
+    assert bpy.context.scene == active
+    assert "FINISHED" in bpy.ops.wm.save_as_mainfile(filepath=str(project))
+
+
+def verify_multi_scene(project):
+    assert "FINISHED" in bpy.ops.wm.open_mainfile(filepath=str(project), load_ui=False, use_scripts=False)
+    assert bpy.context.scene.name == "Active Triangle"
+    expected = {"Active Triangle": ("Triangle", 3, 1), "Secondary Cube": ("Cube", 8, 6)}
+    assert set(bpy.data.scenes.keys()) == set(expected)
+    for name, (object_name, vertices, faces) in expected.items():
+        obj, = [obj for obj in bpy.data.scenes[name].objects if obj.type == "MESH"]
+        assert obj.name == object_name
+        assert (len(obj.data.vertices), len(obj.data.polygons)) == (vertices, faces)
+
+
 if __name__ == "__main__":
     action, *paths = sys.argv[sys.argv.index("--") + 1:]
-    operations = {"create": create, "verify": verify, "create_shared": create_shared, "verify_shared": verify_shared}
+    operations = {
+        "create": create,
+        "verify": verify,
+        "create_shared": create_shared,
+        "verify_shared": verify_shared,
+        "create_multi_scene": create_multi_scene,
+        "verify_multi_scene": verify_multi_scene,
+    }
     operations[action](*(Path(path) for path in paths))
