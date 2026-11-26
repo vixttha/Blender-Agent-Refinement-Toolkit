@@ -3,11 +3,11 @@
   "active": {
     "issue": 114,
     "version": "v0.0.3.5",
-    "phase": "Worker",
-    "next_action": "Correct large-grid fixture root, pin Khronos package integrity and tighten focused GLB checks; preserve failed receipt.",
-    "fix_sha": null,
-    "candidate_sha": null,
-    "pull_request": null,
+    "phase": "Validate",
+    "next_action": "Requalify corrected large-grid fixture, exact Khronos integrity and reserved index rejection at new candidate. No merge/release.",
+    "fix_sha": "2708124690e6cd47a1ad82b9608af76c2e10f2ea",
+    "candidate_sha": "2708124690e6cd47a1ad82b9608af76c2e10f2ea",
+    "pull_request": 115,
     "evidence": []
   },
   "history": [
