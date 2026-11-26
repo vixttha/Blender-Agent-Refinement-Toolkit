@@ -14,7 +14,7 @@ from contextlib import contextmanager
 from pathlib import Path
 
 from .blender_worker import require_runtime
-from .inspect import MAX_PREVIEW_BYTES, inspect_asset, inspect_mesh
+from .inspect import MAX_PREVIEW_BYTES, _signature, inspect_asset, inspect_mesh
 from .obj_records import obj_records
 from .paths import destination_path, root_path, source_path, within_workspace
 
@@ -102,6 +102,31 @@ def _publish(temp: Path, final: Path, root: Path, *, overwrite: bool) -> None:
     else:
         # No check-then-replace race: an existing name is never overwritten.
         os.link(temp, final)
+
+
+def _verify_staged_glb(temp, final, root, identity, digest, cancelled):
+    # Recheck the original inspected file and hash immediately before atomic
+    # publication. The trusted-workspace rule still excludes hostile writers
+    # between this check and the rename/link syscall.
+    _validate_publication(temp, final, root)
+    if _signature(temp.stat()) != identity:
+        raise RuntimeError("Staged GLB changed before publication.")
+    hashed = hashlib.sha256()
+    with temp.open("rb") as stream:
+        if _signature(os.fstat(stream.fileno())) != identity:
+            raise RuntimeError("Staged GLB changed before publication.")
+        remaining = identity[2]
+        while remaining:
+            _require_active(cancelled)
+            data = stream.read(min(remaining, 1024 * 1024))
+            if not data:
+                raise RuntimeError("Staged GLB changed before publication.")
+            hashed.update(data)
+            remaining -= len(data)
+        if _signature(os.fstat(stream.fileno())) != identity:
+            raise RuntimeError("Staged GLB changed before publication.")
+    if _signature(temp.stat()) != identity or hashed.hexdigest() != digest:
+        raise RuntimeError("Staged GLB changed before publication.")
 
 
 def _material_libraries(obj: Path):
@@ -303,6 +328,7 @@ def execute(
             "--python-exit-code", "17", "--python", str(worker), "--", str(job),
         ]
         _run_blender(command, cwd=root, timeout=timeout)
+        _require_active(cancelled)
         if not temporary.is_file() or not report.is_file():
             raise RuntimeError("Blender did not produce the output and geometry report.")
         size = _validate_publication(temporary, final, root)
@@ -328,7 +354,8 @@ def execute(
         artifact_geometry = None
         artifact_sha256 = None
         if suffix == ".glb":
-            artifact_geometry = inspect_asset(temporary, root)
+            staged_identity = _signature(temporary.stat())
+            artifact_geometry = inspect_asset(temporary, root, cancelled=cancelled)
             if artifact_geometry["size_bytes"] != size:
                 raise RuntimeError("Staged GLB size changed before publication.")
             artifact_sha256 = artifact_geometry.pop("sha256")
@@ -340,6 +367,9 @@ def execute(
                 temporary, final, root, source=input_path, overwrite=overwrite, cancelled=cancelled,
             )
         else:
+            _require_active(cancelled)
+            if artifact_sha256 is not None:
+                _verify_staged_glb(temporary, final, root, staged_identity, artifact_sha256, cancelled)
             _require_active(cancelled)
             _publish(temporary, final, root, overwrite=overwrite)
     result = {

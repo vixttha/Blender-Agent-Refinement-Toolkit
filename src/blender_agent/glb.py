@@ -4,6 +4,7 @@ No URI is resolved, no decoder is loaded, and no Blender process is required.
 Counts refer to encoded primitive records, not welded or deformed geometry.
 """
 from array import array
+from fractions import Fraction
 import json
 import math
 import struct
@@ -154,10 +155,19 @@ def _matrix(node):
 
 
 def _mul(a, b):
+    # Keep exact dyadic products and sums across ancestor compositions.
+    # Bound rational complexity independently of the scene traversal limit.
+    a, b = tuple(map(Fraction, a)), tuple(map(Fraction, b))
     m = tuple(sum(a[k*4+r]*b[c*4+k] for k in range(4))
               for c in range(4) for r in range(4))
-    if not all(math.isfinite(v) for v in m):
-        _fail("non-finite composed transform")
+    for value in m:
+        if max(value.numerator.bit_length(), value.denominator.bit_length()) > 8192:
+            _fail("composed transform precision limit exceeded")
+        try:
+            if not math.isfinite(float(value)):
+                _fail("non-finite composed transform")
+        except OverflowError:
+            _fail("non-finite composed transform")
     return m
 
 
@@ -516,11 +526,18 @@ def inspect_glb(stream, length):
                 instance_positions += len(pos)//3
                 if instance_positions > MAX_INSTANCE_POSITIONS or instance_triangles > MAX_INDICES:
                     _fail("instance geometry work limit exceeded")
+                identity = m == IDENTITY
                 for k in range(0, len(pos), 3):
-                    x, y, z = pos[k:k+3]
-                    _include(transformed, (m[0]*x+m[4]*y+m[8]*z+m[12],
-                                           m[1]*x+m[5]*y+m[9]*z+m[13],
-                                           m[2]*x+m[6]*y+m[10]*z+m[14]))
+                    point = pos[k:k+3]
+                    if identity:
+                        _include(transformed, point)
+                    else:
+                        x, y, z = map(Fraction, point)
+                        try:
+                            _include(transformed, tuple(float(m[i]*x+m[i+4]*y+m[i+8]*z+m[i+12])
+                                                        for i in range(3)))
+                        except OverflowError:
+                            _fail("non-finite transformed position")
     if instance_triangles <= instance_degenerate:
         _fail("no usable scene-referenced triangle surface")
     triangles = sum(p[1] for mesh in primitives for p in mesh)

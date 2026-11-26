@@ -11,6 +11,7 @@ import struct
 from pathlib import Path
 
 from .glb import inspect_glb
+from .glb_isolation import inspect_isolated
 from .obj_records import obj_records
 from .paths import root_path, source_path
 
@@ -191,7 +192,21 @@ def inspect_mesh(stream, length: int, suffix: str) -> dict:
     return _obj(_lines(stream, length, "utf-8-sig"))
 
 
-def inspect_asset(path: str | Path, workspace: str | Path = ".") -> dict:
+def inspect_asset(path: str | Path, workspace: str | Path = ".", *, cancelled=None) -> dict:
+    root = root_path(workspace)
+    source = source_path(path, root)
+    if source.suffix.lower() != ".glb":
+        return _inspect_asset_local(source, root)
+    initial = source.stat()
+    if initial.st_size > MAX_PREVIEW_BYTES:
+        raise ValueError("File exceeds the inspection size limit.")
+    result = inspect_isolated(source, root, cancelled)
+    if _signature(initial) != _signature(source.stat()) or result.get("size_bytes") != initial.st_size:
+        raise ValueError("Source file changed during inspection.")
+    return result
+
+
+def _inspect_asset_local(path: str | Path, workspace: str | Path = ".") -> dict:
     root = root_path(workspace)
     source = source_path(path, root)
     suffix = source.suffix.lower()
