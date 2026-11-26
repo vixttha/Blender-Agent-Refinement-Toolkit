@@ -3,11 +3,11 @@
   "active": {
     "issue": 114,
     "version": "v0.0.3.5",
-    "phase": "Worker",
-    "next_action": "Implement owner-approved parser isolation and four current CodeRabbit findings; exact scope amendment in issue and ledger.",
-    "fix_sha": null,
-    "candidate_sha": null,
-    "pull_request": null,
+    "phase": "Validate",
+    "next_action": "Qualify isolated GLB worker on public Windows/Linux, actual memory, timeout, cancellation, admission and staged digest, then exact-head review. No merge/release.",
+    "fix_sha": "6bcc06786cf6c5e822a78908154bfdfccfc29345",
+    "candidate_sha": "6bcc06786cf6c5e822a78908154bfdfccfc29345",
+    "pull_request": 115,
     "evidence": []
   },
   "history": [
