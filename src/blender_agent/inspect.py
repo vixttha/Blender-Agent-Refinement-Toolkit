@@ -10,6 +10,7 @@ import os
 import struct
 from pathlib import Path
 
+from .glb import inspect_glb
 from .obj_records import obj_records
 from .paths import root_path, source_path
 
@@ -185,6 +186,8 @@ def _obj(lines) -> dict:
 def inspect_mesh(stream, length: int, suffix: str) -> dict:
     if suffix == ".stl":
         return _stl(stream, length)
+    if suffix == ".glb":
+        return inspect_glb(stream, length)
     return _obj(_lines(stream, length, "utf-8-sig"))
 
 
@@ -200,7 +203,7 @@ def inspect_asset(path: str | Path, workspace: str | Path = ".") -> dict:
         size = initial.st_size
         if size > 512 * 1024 * 1024:
             raise ValueError("File exceeds the metadata inspection size limit.")
-        if suffix in {".stl", ".obj"} and size > MAX_PREVIEW_BYTES:
+        if suffix in {".stl", ".obj", ".glb"} and size > MAX_PREVIEW_BYTES:
             raise ValueError("File exceeds the inspection size limit.")
         info = {
             "name": source.name, "format": suffix[1:],
@@ -209,8 +212,10 @@ def inspect_asset(path: str | Path, workspace: str | Path = ".") -> dict:
             "limitations": "Does not prove manifoldness, printability, visual quality or game readiness.",
         }
         stream.seek(0)
-        if suffix in {".stl", ".obj"}:
+        if suffix in {".stl", ".obj", ".glb"}:
             info.update(inspect_mesh(stream, size, suffix))
+            if suffix == ".glb":
+                info["inspection"] = "embedded_base_geometry"
         else:
             info["limitations"] += " This format has metadata-only inspection without Blender."
         try:

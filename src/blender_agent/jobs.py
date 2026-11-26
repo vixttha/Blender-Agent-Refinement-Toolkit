@@ -14,7 +14,7 @@ from contextlib import contextmanager
 from pathlib import Path
 
 from .blender_worker import require_runtime
-from .inspect import MAX_PREVIEW_BYTES, inspect_mesh
+from .inspect import MAX_PREVIEW_BYTES, inspect_asset, inspect_mesh
 from .obj_records import obj_records
 from .paths import destination_path, root_path, source_path, within_workspace
 
@@ -325,6 +325,15 @@ def execute(
             with temporary.open("rb") as stream:
                 inspect_mesh(stream, size, suffix)
             artifact_validation = "structural_mesh"
+        artifact_geometry = None
+        artifact_sha256 = None
+        if suffix == ".glb":
+            artifact_geometry = inspect_asset(temporary, root)
+            if artifact_geometry["size_bytes"] != size:
+                raise RuntimeError("Staged GLB size changed before publication.")
+            artifact_sha256 = artifact_geometry.pop("sha256")
+            artifact_geometry.pop("name")
+            artifact_validation = "glb_embedded_base_geometry"
         material = None
         if suffix == ".obj":
             material = _publish_obj(
@@ -341,6 +350,9 @@ def execute(
         "artifact_validation": artifact_validation,
         "note": "Geometry summary only; not a production or printability certification.",
     }
+    if artifact_geometry is not None:
+        result["artifact_geometry"] = artifact_geometry
+        result["artifact_sha256"] = artifact_sha256
     if material is not None:
         result["material_library"] = str(material.relative_to(root))
     return result
