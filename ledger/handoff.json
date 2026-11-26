@@ -3,12 +3,14 @@
   "active": {
     "issue": 114,
     "version": "v0.0.3.5",
-    "phase": "Validate",
-    "next_action": "Qualify isolated GLB worker on public Windows/Linux, actual memory, timeout, cancellation, admission and staged digest, then exact-head review. No merge/release.",
+    "phase": "Internal Auditor",
+    "next_action": "Complete current CodeRabbit review and solo exact-head acceptance; no merge or release without separate approval.",
     "fix_sha": "6bcc06786cf6c5e822a78908154bfdfccfc29345",
     "candidate_sha": "6bcc06786cf6c5e822a78908154bfdfccfc29345",
     "pull_request": 115,
-    "evidence": []
+    "evidence": [
+      "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/actions/runs/45906651690/attempts/1"
+    ]
   },
   "history": [
     {
