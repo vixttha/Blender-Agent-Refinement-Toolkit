@@ -204,18 +204,29 @@ class GlbTests(unittest.TestCase):
             lambda d:d["accessors"][1].update(componentType=5126),
             lambda d:d["meshes"][0]["primitives"][0].update(indices=-1),
             lambda d:d["meshes"][0]["primitives"][0].update(attributes={"POSITION":False}),
-            lambda d:d["meshes"][0]["primitives"][0].update(attributes={"POSITION":0,"NORMAL":1}),
             lambda d:d["meshes"][0]["primitives"][0].update(extensions=None),
         ]
         for i,mutate in enumerate(mutators):
             with self.subTest(case=i):
                 doc,data=fixture()
                 mutate(doc)
-                # NORMAL has same count; use a distinct accessor count to test mismatch.
-                if i==14:
-                    doc["accessors"][1]["count"]=2
                 with self.assertRaisesRegex(ValueError,"GLB"):
                     check(encode(doc,data))
+
+    def test_attribute_count_mismatch_has_independent_accessor(self):
+        doc,data=fixture()
+        doc["accessors"].append({"bufferView":0,"componentType":5126,"count":2,"type":"VEC3"})
+        doc["meshes"][0]["primitives"][0]["attributes"]["NORMAL"]=2
+        with self.assertRaisesRegex(ValueError,"attribute count mismatch"):
+            check(encode(doc,data))
+
+    def test_ancestor_translation_cancellation_preserves_small_offset(self):
+        doc,data=fixture()
+        doc["nodes"]=[{"translation":[2**60,0,0],"children":[1]},
+                      {"translation":[1,0,0],"children":[2]},
+                      {"translation":[-2**60,0,0],"mesh":0}]
+        self.assertEqual(check(encode(doc,data))["scene_base_bounds"],
+                         {"min":[1,0,0],"max":[2,1,0]})
 
     def test_geometry_rejections(self):
         cases=[fixture(indices=(0,1,3)),fixture(indices=(0,1)),fixture(indices=(0,0,1)),

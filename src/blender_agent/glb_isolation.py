@@ -1,6 +1,7 @@
 """Bounded, killable GLB child process; no asset-provided executable code."""
 import json
 import os
+import re
 from pathlib import Path
 import subprocess
 import sys
@@ -61,7 +62,17 @@ def inspect_isolated(source, root, cancelled=None):
                 if not isinstance(envelope, dict):
                     raise RuntimeError("GLB inspection worker returned invalid response.")
                 if envelope.get("ok") is True and isinstance(envelope.get("result"), dict):
-                    return envelope["result"]
+                    result = envelope["result"]
+                    if (result.get("format") != "glb"
+                            or result.get("inspection") != "embedded_base_geometry"
+                            or not isinstance(result.get("sha256"), str)
+                            or not re.fullmatch(r"[0-9a-f]{64}", result["sha256"])
+                            or type(result.get("size_bytes")) is not int
+                            or type(result.get("usable_triangles")) is not int
+                            or result["usable_triangles"] < 1
+                            or result.get("name") != source.name):
+                        raise RuntimeError("GLB inspection worker returned incomplete geometry metadata.")
+                    return result
                 if envelope.get("ok") is False and isinstance(envelope.get("error"), str):
                     if envelope.get("kind") == "invalid":
                         raise ValueError(envelope["error"])

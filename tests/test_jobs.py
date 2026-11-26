@@ -371,6 +371,55 @@ class JobTests(unittest.TestCase):
             else:
                 self.assertEqual(output.read_bytes(), b"other writer")
 
+    def test_staged_glb_same_size_replacement_rejected(self):
+        from blender_agent.inspect import inspect_asset
+        for overwrite in (False, True):
+            with self.subTest(overwrite=overwrite):
+                output=self.root/"changed.glb"
+                if overwrite:
+                    output.write_bytes(b"previous")
+                def changed(path, root, **kwargs):
+                    result=inspect_asset(path, root, **kwargs)
+                    raw=path.read_bytes()
+                    path.write_bytes(raw[:-1]+bytes([raw[-1]^1]))
+                    return result
+                with patch("blender_agent.jobs.shutil.which", return_value="/bin/blender"), \
+                     patch("blender_agent.jobs._run_blender", side_effect=self.fake_success), \
+                     patch("blender_agent.jobs.inspect_asset", side_effect=changed):
+                    with self.assertRaisesRegex(RuntimeError,"Staged GLB changed"):
+                        execute("convert", workspace=self.root, source="input.stl",
+                                output=output.name, overwrite=overwrite)
+                if overwrite:
+                    self.assertEqual(output.read_bytes(),b"previous")
+                else:
+                    self.assertFalse(output.exists())
+                self.assertEqual((self.root/"input.stl").read_bytes(),b"untouched")
+
+    def test_cancelled_blender_never_starts_glb_parser(self):
+        event=threading.Event()
+        def late(command, *, cwd, timeout):
+            self.fake_success(command,cwd=cwd,timeout=timeout)
+            event.set()
+        with patch("blender_agent.jobs.shutil.which",return_value="/bin/blender"), \
+             patch("blender_agent.jobs._run_blender",side_effect=late), \
+             patch("blender_agent.jobs.inspect_asset") as parser:
+            with self.assertRaisesRegex(RuntimeError,"cancelled before publication"):
+                execute("create",workspace=self.root,output="cancelled.glb",kind="cube",cancelled=event)
+            parser.assert_not_called()
+        self.assertFalse((self.root/"cancelled.glb").exists())
+
+    def test_glb_parser_resource_failure_preserves_output(self):
+        output=self.root/"existing.glb"
+        output.write_bytes(b"previous")
+        with patch("blender_agent.jobs.shutil.which",return_value="/bin/blender"), \
+             patch("blender_agent.jobs._run_blender",side_effect=self.fake_success), \
+             patch("blender_agent.glb_isolation.DEADLINE_SECONDS",0):
+            with self.assertRaisesRegex(RuntimeError,"deadline"):
+                execute("convert",workspace=self.root,source="input.stl",output=output.name,overwrite=True)
+        self.assertEqual(output.read_bytes(),b"previous")
+        self.assertEqual((self.root/"input.stl").read_bytes(),b"untouched")
+        self.assertFalse(list(self.root.glob(".blender-agent-*")))
+
     def test_convert_never_modifies_input(self):
         with patch("blender_agent.jobs.shutil.which", return_value="/bin/blender"), \
              patch("blender_agent.jobs._run_blender", side_effect=self.fake_success):

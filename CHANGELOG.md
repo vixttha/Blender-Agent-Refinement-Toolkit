@@ -3,6 +3,7 @@
 ## v0.0.3.5 — development checkpoint
 
 - Add bounded Python-only embedded GLB base geometry inspection and pre-publication validation, with independent artifact geometry and digest distinct from worker source counts (#114, successor to #14). Preserve the historical published v0.0.3 package and existing runtime safety.
+- Isolate GLB parsing on Linux/Windows with memory, deadline, response and concurrency bounds; kill and reap cancelled parsers, verify staged digest again before publication, and preserve precision across composed scene transforms (#114).
 
 ## v0.0.3.4 — development checkpoint
 

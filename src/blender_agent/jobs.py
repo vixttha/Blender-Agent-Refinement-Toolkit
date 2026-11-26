@@ -113,7 +113,9 @@ def _verify_staged_glb(temp, final, root, identity, digest, cancelled):
         raise RuntimeError("Staged GLB changed before publication.")
     hashed = hashlib.sha256()
     with temp.open("rb") as stream:
-        if _signature(os.fstat(stream.fileno())) != identity:
+        opened = _signature(os.fstat(stream.fileno()))
+        # Windows path and descriptor stat identity fields can differ.
+        if opened[2:4] != identity[2:4]:
             raise RuntimeError("Staged GLB changed before publication.")
         remaining = identity[2]
         while remaining:
@@ -123,7 +125,7 @@ def _verify_staged_glb(temp, final, root, identity, digest, cancelled):
                 raise RuntimeError("Staged GLB changed before publication.")
             hashed.update(data)
             remaining -= len(data)
-        if _signature(os.fstat(stream.fileno())) != identity:
+        if _signature(os.fstat(stream.fileno())) != opened:
             raise RuntimeError("Staged GLB changed before publication.")
     if _signature(temp.stat()) != identity or hashed.hexdigest() != digest:
         raise RuntimeError("Staged GLB changed before publication.")
