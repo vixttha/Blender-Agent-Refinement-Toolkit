@@ -1,8 +1,9 @@
 name: Blender-Agent Refinement Toolkit Graphify HQ
 on:
-  push:
-    branches:
-      - 'audit/graphify-v0.0.3.4-issue45'
+  pull_request:
+    branches: [graphify-hq]
+    paths:
+      - '.github/workflows/graphify-hq.yml'
 permissions:
   contents: read
 env:
