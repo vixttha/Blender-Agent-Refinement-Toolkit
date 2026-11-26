@@ -3,14 +3,12 @@
   "active": {
     "issue": 45,
     "version": "v0.0.3.4",
-    "phase": "Head",
-    "next_action": "Owner explicitly authorized integration of PR #110 at 4cb5c7a4fb52bbefca1ff1172604d66d67b63ee2. Final solo audit and 10/10 public CI verified unchanged. CodeRabbit full review requested (comment 7126313290); reconcile exact-head review and any blockers before merging. If candidate or base changes, revalidate affected evidence. Then merge once, verify main push CI and archive #45. No release.",
-    "fix_sha": "4cb5c7a4fb52bbefca1ff1172604d66d67b63ee2",
-    "candidate_sha": "4cb5c7a4fb52bbefca1ff1172604d66d67b63ee2",
+    "phase": "Validate",
+    "next_action": "Check exact head 67a19cd11a7c793d425346e12221397d4d07aa3e and CI run 45899633280, reconcile CodeRabbit and review before new merge approval. No merge or release.",
+    "fix_sha": "67a19cd11a7c793d425346e12221397d4d07aa3e",
+    "candidate_sha": "67a19cd11a7c793d425346e12221397d4d07aa3e",
     "pull_request": 110,
-    "evidence": [
-      "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/actions/runs/45339017170/attempts/1"
-    ]
+    "evidence": []
   },
   "history": [
     {
@@ -48,6 +46,23 @@
       "disposition": "integrated",
       "decision": "Owner explicitly approved PR #109 at exact candidate as v0.0.3.3. Solo audit and exact-head CodeRabbit review passed. Main push CI 10/10 passed.",
       "merged_sha": "392d8d7a1c262227cba3c08d5577af38c74b4e25"
+    },
+    {
+      "handoff": {
+        "issue": 45,
+        "version": "v0.0.3.4",
+        "phase": "Head",
+        "next_action": "Owner explicitly authorized integration of PR #110 at 4cb5c7a4fb52bbefca1ff1172604d66d67b63ee2. Final solo audit and 10/10 public CI verified unchanged. CodeRabbit full review requested (comment 7126313290); reconcile exact-head review and any blockers before merging. If candidate or base changes, revalidate affected evidence. Then merge once, verify main push CI and archive #45. No release.",
+        "fix_sha": "4cb5c7a4fb52bbefca1ff1172604d66d67b63ee2",
+        "candidate_sha": "4cb5c7a4fb52bbefca1ff1172604d66d67b63ee2",
+        "pull_request": 110,
+        "evidence": [
+          "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/actions/runs/45339017170/attempts/1"
+        ]
+      },
+      "disposition": "rework",
+      "decision": "Owner authorized #45-only rework: qualify 4.5.17/5.2.5, recovery and CLI/MCP rejection regressions; prior merge approval is historical and does not apply to new head.",
+      "merged_sha": null
     }
   ]
 }
