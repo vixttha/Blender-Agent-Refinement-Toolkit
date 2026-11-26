@@ -3,11 +3,11 @@
   "active": {
     "issue": 114,
     "version": "v0.0.3.5",
-    "phase": "Worker",
-    "next_action": "Repair confirmed GLB conformance boundaries from solo audit, add targeted regressions and requalify.",
-    "fix_sha": null,
-    "candidate_sha": null,
-    "pull_request": null,
+    "phase": "Validate",
+    "next_action": "Repeat public matrix and exact-head CodeRabbit after three format-boundary repairs. No merge/release.",
+    "fix_sha": "cffe226a9580313e93ed3e9df4d323130bcfe884",
+    "candidate_sha": "cffe226a9580313e93ed3e9df4d323130bcfe884",
+    "pull_request": 115,
     "evidence": []
   },
   "history": [
