@@ -3,14 +3,12 @@
   "active": {
     "issue": 114,
     "version": "v0.0.3.5",
-    "phase": "Internal Auditor",
-    "next_action": "Application CI 10/10 passed; finalize exact-head CodeRabbit review and solo Internal Auditor assessment. No merge/release.",
-    "fix_sha": "2708124690e6cd47a1ad82b9608af76c2e10f2ea",
-    "candidate_sha": "2708124690e6cd47a1ad82b9608af76c2e10f2ea",
-    "pull_request": 115,
-    "evidence": [
-      "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/actions/runs/45904365890/attempts/1"
-    ]
+    "phase": "Worker",
+    "next_action": "Repair confirmed GLB conformance boundaries from solo audit, add targeted regressions and requalify.",
+    "fix_sha": null,
+    "candidate_sha": null,
+    "pull_request": null,
+    "evidence": []
   },
   "history": [
     {
@@ -97,6 +95,23 @@
       },
       "disposition": "rework",
       "decision": "Public run 45904209455 failed large-grid fixture due to relative workspace path duplication. Native cube Khronos validation passed with zero issues and emitted exact package integrity; repair the test path, pin integrity, address focused parser review findings, requalify.",
+      "merged_sha": null
+    },
+    {
+      "handoff": {
+        "issue": 114,
+        "version": "v0.0.3.5",
+        "phase": "Internal Auditor",
+        "next_action": "Application CI 10/10 passed; finalize exact-head CodeRabbit review and solo Internal Auditor assessment. No merge/release.",
+        "fix_sha": "2708124690e6cd47a1ad82b9608af76c2e10f2ea",
+        "candidate_sha": "2708124690e6cd47a1ad82b9608af76c2e10f2ea",
+        "pull_request": 115,
+        "evidence": [
+          "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/actions/runs/45904365890/attempts/1"
+        ]
+      },
+      "disposition": "rework",
+      "decision": "Solo exact-head audit against Khronos glTF 2.0 alignment and sparse-accessor rules and KHR_meshopt_compression: support permitted matrix trailing padding, reject sparse view target and KHR meshopt alongside EXT. Preserve passing 10/10 evidence as historical; rerun affected candidate.",
       "merged_sha": null
     }
   ]
