@@ -3,11 +3,11 @@
   "active": {
     "issue": 114,
     "version": "v0.0.3.5",
-    "phase": "Validate",
-    "next_action": "Run exact candidate public CI; resolve any demonstrated gaps; pin independent validator integrity, then exact-head CodeRabbit and solo audit. No merge/release.",
-    "fix_sha": "4c10469708c4d475d76f5fdc9ae12348eadb8f10",
-    "candidate_sha": "4c10469708c4d475d76f5fdc9ae12348eadb8f10",
-    "pull_request": 115,
+    "phase": "Worker",
+    "next_action": "Correct large-grid fixture root, pin Khronos package integrity and tighten focused GLB checks; preserve failed receipt.",
+    "fix_sha": null,
+    "candidate_sha": null,
+    "pull_request": null,
     "evidence": []
   },
   "history": [
@@ -81,6 +81,21 @@
       "disposition": "integrated",
       "decision": "Owner requested exact unchanged PR #110 integration; solo Color Team OPS audit, CodeRabbit and PR and main public CI passed. Graphify admission failure separately documented; no fresh graph claim. No release.",
       "merged_sha": "e0e887a5e991a7a6ed7597e4a36dd47a49cd8ccb"
+    },
+    {
+      "handoff": {
+        "issue": 114,
+        "version": "v0.0.3.5",
+        "phase": "Validate",
+        "next_action": "Run exact candidate public CI; resolve any demonstrated gaps; pin independent validator integrity, then exact-head CodeRabbit and solo audit. No merge/release.",
+        "fix_sha": "4c10469708c4d475d76f5fdc9ae12348eadb8f10",
+        "candidate_sha": "4c10469708c4d475d76f5fdc9ae12348eadb8f10",
+        "pull_request": 115,
+        "evidence": []
+      },
+      "disposition": "rework",
+      "decision": "Public run 45904209455 failed large-grid fixture due to relative workspace path duplication. Native cube Khronos validation passed with zero issues and emitted exact package integrity; repair the test path, pin integrity, address focused parser review findings, requalify.",
+      "merged_sha": null
     }
   ]
 }
