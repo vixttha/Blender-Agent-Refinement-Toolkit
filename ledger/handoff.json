@@ -4,7 +4,7 @@
     "issue": 114,
     "version": "v0.0.3.5",
     "phase": "Validate",
-    "next_action": "Run full public matrix and exact-head CodeRabbit review of all five repaired findings. No merge/release.",
+    "next_action": "Complete remaining exact-head CI and CodeRabbit; no integration.",
     "fix_sha": "062dc86ac8d0bcee0d9c3552bb01c2138486b1e2",
     "candidate_sha": "062dc86ac8d0bcee0d9c3552bb01c2138486b1e2",
     "pull_request": 115,
