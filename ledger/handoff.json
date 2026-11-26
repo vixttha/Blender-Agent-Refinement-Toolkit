@@ -1,17 +1,6 @@
 {
   "schema_version": 1,
-  "active": {
-    "issue": 45,
-    "version": "v0.0.3.4",
-    "phase": "Head",
-    "next_action": "PR #110 merged to exact main e0e887a5e991a7a6ed7597e4a36dd47a49cd8ccb, tree matches tested candidate. Verify post-merge push run 45900965702 before final integrated disposition and issue #45 closure. No release.",
-    "fix_sha": "67a19cd11a7c793d425346e12221397d4d07aa3e",
-    "candidate_sha": "67a19cd11a7c793d425346e12221397d4d07aa3e",
-    "pull_request": 110,
-    "evidence": [
-      "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/actions/runs/45899633280/attempts/1"
-    ]
-  },
+  "active": null,
   "history": [
     {
       "handoff": {
@@ -65,6 +54,24 @@
       "disposition": "rework",
       "decision": "Owner authorized #45-only rework: qualify 4.5.17/5.2.5, recovery and CLI/MCP rejection regressions; prior merge approval is historical and does not apply to new head.",
       "merged_sha": null
+    },
+    {
+      "handoff": {
+        "issue": 45,
+        "version": "v0.0.3.4",
+        "phase": "Head",
+        "next_action": "Integrated exact main and verified all ten push CI jobs. Close #45 after archiving; no release.",
+        "fix_sha": "67a19cd11a7c793d425346e12221397d4d07aa3e",
+        "candidate_sha": "67a19cd11a7c793d425346e12221397d4d07aa3e",
+        "pull_request": 110,
+        "evidence": [
+          "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/actions/runs/45899633280/attempts/1",
+          "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/actions/runs/45900965702/attempts/1"
+        ]
+      },
+      "disposition": "integrated",
+      "decision": "Owner requested exact unchanged PR #110 integration; solo Color Team OPS audit, CodeRabbit and PR and main public CI passed. Graphify admission failure separately documented; no fresh graph claim. No release.",
+      "merged_sha": "e0e887a5e991a7a6ed7597e4a36dd47a49cd8ccb"
     }
   ]
 }

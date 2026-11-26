@@ -194,7 +194,7 @@
     {
       "issue": 45,
       "version": "v0.0.3.4",
-      "state": "in_progress",
+      "state": "integrated",
       "acceptance": [
         "Reject affected and unapproved Blender branches and prereleases before importing any asset; enforce branch-aware 4.5 LTS >=4.5.15 and 5.2 LTS >=5.2.3 floors and expose the actual version. Python-only inspection remains unaffected.",
         "Verify maintained Blender 4.5 LTS on standard public Ubuntu and Windows with benign installed-wheel MCP/CLI fixtures, and verify the admitted 5.2 LTS on Ubuntu. Cover supported and unsupported version fixtures, including pre-import rejection.",
