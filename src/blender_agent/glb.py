@@ -217,7 +217,8 @@ class _Geometry:
                 stride = _int(view["byteStride"], "byteStride", 4, 252)
                 if stride % 4:
                     _fail("misaligned byteStride")
-            if "EXT_meshopt_compression" in _dict(view.get("extensions", {}), "bufferView extensions"):
+            extensions = _dict(view.get("extensions", {}), "bufferView extensions")
+            if {"EXT_meshopt_compression", "KHR_meshopt_compression"}.intersection(extensions):
                 _fail("unsupported compressed bufferView")
         # Validate layouts of all accessors, including unconsumed inventory attributes.
         self.layouts = [self.layout(a) for a in self.accessors]
@@ -227,15 +228,17 @@ class _Geometry:
     def records(self, key):
         return [_dict(x, key + " entry") for x in _list(self.doc.get(key, []), key)]
 
-    def region(self, view_index, offset, count, item, alignment, *, packed=False):
+    def region(self, view_index, offset, count, item, alignment, *, packed=False, tail_padding=0, sparse=False):
         view = _ref(self.views, view_index, "bufferView reference")
         start = _int(view.get("byteOffset", 0), "view offset") + offset
         stride = view.get("byteStride", item)
         if packed and "byteStride" in view:
             _fail("packed accessor cannot be strided")
+        if sparse and "target" in view:
+            _fail("sparse bufferView cannot declare target")
         if stride < item or stride % alignment or offset % alignment or start % alignment:
             _fail("invalid accessor stride or alignment")
-        if offset + (count-1)*stride + item > view["byteLength"]:
+        if offset + (count-1)*stride + item - tail_padding > view["byteLength"]:
             _fail("accessor outside bufferView")
         return start, stride
 
@@ -247,15 +250,18 @@ class _Geometry:
         unit = struct.calcsize("<" + COMPONENTS[component])
         item = SHAPES[shape]*unit
         alignment = unit
+        tail_padding = 0
         if shape.startswith("MAT"):
             dim = int(shape[-1])
-            item = dim*((dim*unit+3)//4*4)
+            column_stride = (dim*unit+3)//4*4
+            item = dim*column_stride
+            tail_padding = column_stride - dim*unit
             alignment = max(4, unit)
         count = _int(a.get("count"), "accessor count", 1, MAX_INDICES)
         offset = _int(a.get("byteOffset", 0), "accessor offset")
         base = None
         if "bufferView" in a:
-            base = self.region(a["bufferView"], offset, count, item, alignment)
+            base = self.region(a["bufferView"], offset, count, item, alignment, tail_padding=tail_padding)
         elif offset:
             _fail("accessor without bufferView has offset")
         sparse = a.get("sparse")
@@ -274,10 +280,10 @@ class _Geometry:
             decoder = struct.Struct("<" + COMPONENTS[ic])
             ip, istride = self.region(indices.get("bufferView"),
                 _int(indices.get("byteOffset", 0), "sparse index offset"), n,
-                decoder.size, decoder.size, packed=True)
+                decoder.size, decoder.size, packed=True, sparse=True)
             vp, vstride = self.region(values.get("bufferView"),
                 _int(values.get("byteOffset", 0), "sparse value offset"), n,
-                item, alignment, packed=True)
+                item, alignment, packed=True, tail_padding=tail_padding, sparse=True)
             last = -1
             for j in range(n):
                 k, = decoder.unpack_from(self.binary, ip+j*istride)

@@ -89,6 +89,35 @@ class GlbTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"restart index"):
             check(encode(doc,data))
 
+    def test_matrix_trailing_padding_may_be_omitted(self):
+        # MAT3 unsigned byte: 3 four-byte columns, final byte may be omitted.
+        for count in (1, 2):
+            with self.subTest(count=count):
+                doc, data = fixture()
+                data += b"\0" * (-len(data) % 4)
+                payload = b"\0" * (12*count - 1)
+                doc["bufferViews"].append({"buffer":0,"byteOffset":len(data),"byteLength":len(payload)})
+                doc["accessors"].append({"bufferView":2,"componentType":5121,"count":count,"type":"MAT3"})
+                doc["buffers"][0]["byteLength"] = len(data)+len(payload)
+                self.assertEqual(check(encode(doc,data+payload))["triangles"],1)
+                doc["bufferViews"][2]["byteLength"] -= 1
+                with self.assertRaisesRegex(ValueError,"outside bufferView"):
+                    check(encode(doc,data+payload))
+
+    def test_sparse_views_must_not_have_target(self):
+        doc,data=fixture(indices=None)
+        data = bytes((1,2,0,0))+struct.pack("<6f",1,0,0,0,1,0)
+        doc["bufferViews"]=[{"buffer":0,"byteLength":2},{"buffer":0,"byteOffset":4,"byteLength":24}]
+        doc["accessors"][0].pop("bufferView")
+        doc["accessors"][0]["sparse"]={"count":2,"indices":{"bufferView":0,"componentType":5121},
+                                      "values":{"bufferView":1}}
+        doc["buffers"][0]["byteLength"]=len(data)
+        for view in doc["bufferViews"]:
+            view["target"]=34962
+            with self.assertRaisesRegex(ValueError,"sparse bufferView cannot declare target"):
+                check(encode(doc,data))
+            del view["target"]
+
     def test_sparse_positions(self):
         doc,data=fixture(indices=None)
         data = bytes((1,2,0,0))+struct.pack("<6f",1,0,0,0,1,0)
@@ -220,6 +249,7 @@ class GlbTests(unittest.TestCase):
         mutators=[lambda d:d.update(extensionsRequired=["KHR_mesh_quantization"]),
                   lambda d:d["meshes"][0]["primitives"][0].update(extensions={"KHR_draco_mesh_compression":{}}),
                   lambda d:d["bufferViews"][0].update(extensions={"EXT_meshopt_compression":{}}),
+                  lambda d:d["bufferViews"][0].update(extensions={"KHR_meshopt_compression":{}}),
                   lambda d:d["nodes"][0].update(extensions={"EXT_mesh_gpu_instancing":{}}),
                   lambda d:d["buffers"][0].update(uri="https://example.invalid/data.bin"),
                   lambda d:d.update(images=[{"uri":"../private.png"}])]
