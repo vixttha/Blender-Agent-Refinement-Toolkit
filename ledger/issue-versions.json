@@ -200,6 +200,17 @@
         "Verify maintained Blender 4.5 LTS on standard public Ubuntu and Windows with benign installed-wheel MCP/CLI fixtures, and verify the admitted 5.2 LTS on Ubuntu. Cover supported and unsupported version fixtures, including pre-import rejection.",
         "Pin exact verified archive SHA-256 values and align active README, harness, security and skill guidance; retain existing regression coverage, historical release records and separate owner merge authorization."
       ]
+    },
+    {
+      "issue": 114,
+      "version": "v0.0.3.5",
+      "state": "in_progress",
+      "acceptance": [
+        "Bounded standalone GLB 2.0 structural inspection decodes actual binary positions, indices, sparse accessors, triangle topology and bounds; explicitly reports scope and unsupported features; no external resource reads.",
+        "Reject malformed or entirely unusable GLB surfaces before publication, distinguish source scene from artifact geometry and bind staged size/digest; preserve existing source, overwrite, cancellation, runtime and OBJ recovery guarantees.",
+        "Qualify native empty geometry and GLB creation/conversion/repair/reimport, installed wheel CLI/MCP and synthetic ~500k triangle fixture on existing free public runners; independently cross-check Khronos conformance and native geometry.",
+        "Record exact-head CI, CodeRabbit and solo audit, documentation/limitations and graph evidence or documented source fallback; separate owner merge/release approval."
+      ]
     }
   ]
 }

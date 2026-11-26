@@ -1,6 +1,15 @@
 {
   "schema_version": 1,
-  "active": null,
+  "active": {
+    "issue": 114,
+    "version": "v0.0.3.5",
+    "phase": "Worker",
+    "next_action": "Implement approved successor to #14 at baseline e0e887a5e991a7a6ed7597e4a36dd47a49cd8ccb; no merge or release.",
+    "fix_sha": null,
+    "candidate_sha": null,
+    "pull_request": null,
+    "evidence": []
+  },
   "history": [
     {
       "handoff": {
