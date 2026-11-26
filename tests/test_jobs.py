@@ -362,7 +362,9 @@ class JobTests(unittest.TestCase):
                     output.write_bytes(b"other writer")
             with patch("blender_agent.jobs.shutil.which", return_value="/bin/blender"), \
                  patch("blender_agent.jobs._run_blender", side_effect=late):
-                with self.assertRaises(RuntimeError if cancel else FileExistsError):
+                expected = (self.assertRaisesRegex(RuntimeError, "cancelled before publication")
+                            if cancel else self.assertRaises(FileExistsError))
+                with expected:
                     execute("create", workspace=self.root, output=output.name, kind="cube", cancelled=event)
             if cancel:
                 self.assertFalse(output.exists())

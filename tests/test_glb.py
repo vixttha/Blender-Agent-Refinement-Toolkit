@@ -1,6 +1,7 @@
 """Deterministic, synthetic GLB fixtures and bounded parser regressions."""
 import copy
 import hashlib
+import itertools
 import io
 import json
 import math
@@ -82,6 +83,34 @@ class GlbTests(unittest.TestCase):
                 self.assertEqual(check(encode(*fixture(points,(0,1,2,3),mode=mode)))["triangles"],2)
         result = check(encode(*fixture(points,(0,1,2,0,0,1))))
         self.assertEqual((result["triangles"],result["degenerate_triangles"],result["usable_triangles"]),(2,1,1))
+
+    def test_exact_degeneracy_independent_of_vertex_order(self):
+        for points, degenerate in (
+            (((2**60,3*2**60,0),(0,0,0),(80,240,0)),True),
+            (((2**60,2**60,0),(0,0,0),(1,0,0)),False),
+            (((0,0,0),(2**-149,0,0),(0,2**-149,0)),False),
+            (((0,0,0),(1,1,1),(2,2,2)),True),
+        ):
+            for order in itertools.permutations(points):
+                with self.subTest(order=order, degenerate=degenerate):
+                    doc,data=fixture(order)
+                    if degenerate:
+                        with self.assertRaisesRegex(ValueError,"no usable scene-referenced"):
+                            check(encode(doc,data))
+                    else:
+                        self.assertEqual(check(encode(doc,data))["usable_triangles"],1)
+
+    def test_position_bounds_use_exact_float32_precision(self):
+        doc,data=fixture(((0,0,0),(1000000,0,0),(0,1,0)))
+        for bad in (999999.5, 1e100):
+            with self.subTest(bound=bad):
+                doc["accessors"][0]["max"][0]=bad
+                with self.assertRaisesRegex(ValueError,"POSITION bound"):
+                    check(encode(doc,data))
+        doc["accessors"][0]["max"][0]=1000000.01
+        self.assertEqual(check(encode(doc,data))["bounds"]["max"][0],1000000)
+        doc,data=fixture(((0,0,0),(0.1,0,0),(0,1,0)))
+        self.assertEqual(check(encode(doc,data))["triangles"],1)
 
     def test_reserved_primitive_restart_index(self):
         points = [(0,0,0),(1,0,0),(0,1,0)] + [(1,1,0)]*253

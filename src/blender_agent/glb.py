@@ -178,9 +178,38 @@ def _bounds(box):
 
 
 def _degenerate(a, b, c):
+    # Finite binary32 inputs have exact binary64 representations. Nonzero
+    # coordinate differences and their products cannot underflow or overflow
+    # binary64. Certify a nonzero determinant only outside a conservative
+    # orient2d roundoff bound; resolve ambiguous projections with exact integers.
     u = [b[i]-a[i] for i in range(3)]
     v = [c[i]-a[i] for i in range(3)]
-    return all(u[i]*v[j] == u[j]*v[i] for i, j in ((0, 1), (1, 2), (2, 0)))
+    pairs = ((0, 1), (1, 2), (2, 0))
+    ambiguous = False
+    for i, j in pairs:
+        p, q = u[i]*v[j], u[j]*v[i]
+        if abs(p-q) > (8 * 2**-52) * (abs(p)+abs(q)):
+            return False
+        if p or q:
+            ambiguous = True
+    if not ambiguous:
+        return True
+    ratios = [float(x).as_integer_ratio() for point in (a, b, c) for x in point]
+    denominator = max(d for _, d in ratios)
+    exact = [n*(denominator//d) for n, d in ratios]
+    u = [exact[i+3]-exact[i] for i in range(3)]
+    v = [exact[i+6]-exact[i] for i in range(3)]
+    return all(u[i]*v[j] == u[j]*v[i] for i, j in pairs)
+
+
+def _float32(value):
+    try:
+        result, = struct.unpack("<f", struct.pack("<f", value))
+    except (OverflowError, struct.error):
+        _fail("POSITION bound outside finite float32 range")
+    if not math.isfinite(result):
+        _fail("POSITION bound outside finite float32 range")
+    return result
 
 
 class _Geometry:
@@ -340,7 +369,7 @@ class _Geometry:
         accessor = self.accessors[attributes["POSITION"]]
         for key, actual in zip(("min", "max"), local):
             declared = _numbers(accessor.get(key), 3, "POSITION " + key)
-            if any(not math.isclose(a, b, rel_tol=1e-6, abs_tol=1e-12) for a, b in zip(actual, declared)):
+            if any(a != _float32(b) for a, b in zip(actual, declared)):
                 _fail("declared POSITION bounds do not match binary data")
         count = len(pos)//3
         for key, index in attributes.items():
