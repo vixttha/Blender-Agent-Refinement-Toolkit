@@ -3,12 +3,14 @@
   "active": {
     "issue": 114,
     "version": "v0.0.3.5",
-    "phase": "Validate",
-    "next_action": "Complete remaining exact-head CI and CodeRabbit; no integration.",
+    "phase": "Internal Auditor",
+    "next_action": "Complete exact-head CodeRabbit read-back, evaluate any new findings and finalize solo merge review. No merge/release.",
     "fix_sha": "062dc86ac8d0bcee0d9c3552bb01c2138486b1e2",
     "candidate_sha": "062dc86ac8d0bcee0d9c3552bb01c2138486b1e2",
     "pull_request": 115,
-    "evidence": []
+    "evidence": [
+      "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/actions/runs/45905384249/attempts/1"
+    ]
   },
   "history": [
     {
