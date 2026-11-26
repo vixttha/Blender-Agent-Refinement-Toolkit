@@ -75,7 +75,11 @@ def _container(stream, length):
         _fail("invalid magic, version or declared length")
     offset = 12
     document = binary = None
+    chunks = 0
     while offset < length:
+        chunks += 1
+        if chunks > MAX_RECORDS:
+            _fail("chunk count limit exceeded")
         if length - offset < 8:
             _fail("truncated chunk header")
         size, kind = struct.unpack("<I4s", _read(stream, 8))
@@ -213,10 +217,12 @@ class _Geometry:
                 stride = _int(view["byteStride"], "byteStride", 4, 252)
                 if stride % 4:
                     _fail("misaligned byteStride")
-            if "EXT_meshopt_compression" in view.get("extensions", {}):
+            if "EXT_meshopt_compression" in _dict(view.get("extensions", {}), "bufferView extensions"):
                 _fail("unsupported compressed bufferView")
         # Validate layouts of all accessors, including unconsumed inventory attributes.
         self.layouts = [self.layout(a) for a in self.accessors]
+        if any(binary[length:]):
+            _fail("nonzero BIN padding")
 
     def records(self, key):
         return [_dict(x, key + " entry") for x in _list(self.doc.get(key, []), key)]
@@ -300,6 +306,8 @@ class _Geometry:
                 _fail("index work limit exceeded")
         if a.get("normalized", False) is not False:
             _fail("normalized positions or indices unsupported")
+        if position and base is not None and (base[0] % 4 or base[1] % 4):
+            _fail("misaligned POSITION")
         decoder = struct.Struct("<" + COMPONENTS[component]*SHAPES[shape])
         zero = (0,)*SHAPES[shape]
         for k in range(count):
@@ -312,15 +320,22 @@ class _Geometry:
 
     def primitive(self, p, box, material_count):
         p = _dict(p, "primitive")
-        if "KHR_draco_mesh_compression" in p.get("extensions", {}):
+        if "KHR_draco_mesh_compression" in _dict(p.get("extensions", {}), "primitive extensions"):
             _fail("unsupported compressed primitive")
         attributes = _dict(p.get("attributes"), "attributes")
         if "POSITION" not in attributes:
             _fail("missing POSITION")
         pos = array("f")
+        local = _box()
         for point in self.values(attributes["POSITION"], position=True):
             _include(box, point)
+            _include(local, point)
             pos.extend(point)
+        accessor = self.accessors[attributes["POSITION"]]
+        for key, actual in zip(("min", "max"), local):
+            declared = _numbers(accessor.get(key), 3, "POSITION " + key)
+            if any(not math.isclose(a, b, rel_tol=1e-6, abs_tol=1e-12) for a, b in zip(actual, declared)):
+                _fail("declared POSITION bounds do not match binary data")
         count = len(pos)//3
         for key, index in attributes.items():
             _ref(self.accessors, index, "attribute reference")
@@ -407,7 +422,7 @@ def inspect_glb(stream, length):
     children = []
     matrices = []
     for i, node in enumerate(nodes):
-        if "EXT_mesh_gpu_instancing" in node.get("extensions", {}):
+        if "EXT_mesh_gpu_instancing" in _dict(node.get("extensions", {}), "node extensions"):
             _fail("unsupported GPU instancing")
         if "mesh" in node:
             _ref(meshes, node["mesh"], "node mesh")

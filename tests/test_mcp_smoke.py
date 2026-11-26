@@ -15,6 +15,8 @@ import sysconfig
 import tempfile
 from pathlib import Path
 
+from test_glb import triangle_glb
+
 
 async def call_tool(session, name, **arguments):
     subject = arguments.get("output", arguments.get("path", ""))
@@ -47,6 +49,10 @@ async def publish(session, workspace, tool, operation, *, output, **arguments):
     assert Path(payload["output"]) == Path(output), payload
     content = (workspace / output).read_bytes()
     assert 0 < len(content) == payload["size_bytes"], payload
+    if output.endswith(".glb"):
+        assert payload["artifact_validation"] == "glb_embedded_base_geometry", payload
+        assert payload["artifact_sha256"] == hashlib.sha256(content).hexdigest(), payload
+        assert payload["artifact_geometry"]["usable_triangles"] > 0, payload
     geometry = payload["geometry"]
     assert geometry["mesh_objects"] == 1 and geometry["faces"] > 0, payload
     return content, geometry
@@ -80,6 +86,16 @@ async def blender_roundtrip(session, workspace):
                 ), (name, info)
         else:
             assert info["format"] == "glb" and content.startswith(b"glTF"), info
+            assert info["triangles"] == 12 and info["degenerate_triangles"] == 0, info
+
+    for tool, operation, name, args in (
+        ("create_primitive", "create", "direct.glb", {"kind": "cube"}),
+        ("repair_mesh", "repair", "repaired.glb", {"source": "cube.glb"}),
+    ):
+        content, _ = await publish(session, workspace, tool, operation, output=name, **args)
+        assert (await call_tool(session, "inspect_model", path=name))["triangles"] == 12
+        snapshots[name] = content
+    print("GLB artifact inspection: native create, convert, repair and STL reimport geometry passed.")
 
     # Two adjacent triangles whose shared edge is split by less than the weld distance.
     seam = b"v 0 0 0\nv 1 0 0\nv 0 1 0\nv 1.00005 0 0\nv 0.00005 1 0\nv 1 1 0\nf 1 2 3\nf 4 6 5\n"
@@ -163,6 +179,9 @@ async def reject_faceless_output(session, workspace):
         session, "convert_model", "No mesh faces are available for output.",
         source="wire.obj", output="faceless.stl",
     )
+    await expect_error(session, "convert_model", "No mesh faces are available for output.",
+                       source="wire.obj", output="faceless.glb")
+    assert not (workspace / "faceless.glb").exists()
     assert not (workspace / "faceless.stl").exists()
     assert (workspace / "wire.obj").read_bytes() == wire
     print("MCP geometry: Blender rejected a wire-only OBJ without publishing an output.")
@@ -523,6 +542,18 @@ async def smoke(blender):
                 payload = await call_tool(session, "inspect_model", path="mesh.obj")
                 assert payload["faces"] == 1, payload
                 assert source.read_text(encoding="utf-8") == mesh
+                raw = triangle_glb()
+                (workspace / "triangle.glb").write_bytes(raw)
+                (workspace / "invalid.glb").write_bytes(b"invalid")
+                glb_info = await call_tool(session, "inspect_model", path="triangle.glb")
+                result = subprocess.run([cli, "--workspace", str(workspace), "inspect", "triangle.glb"],
+                                        cwd=host_directory, env=env, capture_output=True, text=True, timeout=15)
+                assert result.returncode == 0 and json.loads(result.stdout) == glb_info, result
+                assert glb_info["triangles"] == 1 and glb_info["sha256"] == hashlib.sha256(raw).hexdigest()
+                await expect_error(session, "inspect_model", "GLB:", path="invalid.glb")
+                (workspace / "triangle.glb").unlink()
+                (workspace / "invalid.glb").unlink()
+                print("Installed CLI/MCP GLB inspection agreement and malformed rejection: PASS")
                 print("Installed MCP launcher handshake, tool schemas and workspace isolation: PASS")
                 if blender is not None:
                     await blender_roundtrip(session, workspace)

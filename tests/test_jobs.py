@@ -1,4 +1,5 @@
 import concurrent.futures
+import hashlib
 import json
 import os
 import subprocess
@@ -12,6 +13,8 @@ from unittest.mock import patch
 from blender_agent.jobs import (
     MAX_INPUT_BYTES, MAX_LOG_BYTES, MAX_OUTPUT_BYTES, _obj_lock, _publish, _run_blender, execute,
 )
+
+from test_glb import triangle_glb
 
 TRIANGLE_STL = (
     b"solid triangle\nfacet normal 0 0 1\nouter loop\nvertex 0 0 0\nvertex 1 0 0\n"
@@ -59,7 +62,7 @@ class JobTests(unittest.TestCase):
     def fake_success(command, *, cwd, timeout):
         job = json.loads(Path(command[-1]).read_text(encoding="utf-8"))
         output = Path(job["output"])
-        output.write_bytes({".stl": TRIANGLE_STL, ".obj": TRIANGLE_OBJ}.get(output.suffix, b"mock-export"))
+        output.write_bytes({".stl": TRIANGLE_STL, ".obj": TRIANGLE_OBJ, ".glb": triangle_glb()}.get(output.suffix, b"mock-export"))
         Path(job["report"]).write_text(
             json.dumps({"mesh_objects": 1, "vertices": 8, "faces": 6,
                         "boundary_edges": 0, "nonmanifold_edges": 0, "blender_version": "4.5.16"}),
@@ -312,6 +315,59 @@ class JobTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "STL"):
                 execute("create", workspace=self.root, output="cube.stl", kind="cube")
         self.assertFalse((self.root / "cube.stl").exists())
+
+    def test_glb_rejects_invalid_export_and_preserves_destination(self):
+        for overwrite in (False, True):
+            with self.subTest(overwrite=overwrite):
+                output = self.root / "invalid.glb"
+                if overwrite:
+                    output.write_bytes(b"previous asset")
+                def invalid(command, *, cwd, timeout):
+                    self.fake_success(command, cwd=cwd, timeout=timeout)
+                    job = json.loads(Path(command[-1]).read_text(encoding="utf-8"))
+                    Path(job["output"]).write_bytes(b"not a valid GLB")
+                with patch("blender_agent.jobs.shutil.which", return_value="/bin/blender"), \
+                     patch("blender_agent.jobs._run_blender", side_effect=invalid):
+                    with self.assertRaisesRegex(ValueError, "GLB"):
+                        execute("convert", workspace=self.root, source="input.stl",
+                                output=output.name, overwrite=overwrite)
+                self.assertEqual((self.root / "input.stl").read_bytes(), b"untouched")
+                if overwrite:
+                    self.assertEqual(output.read_bytes(), b"previous asset")
+                else:
+                    self.assertFalse(output.exists())
+                self.assertFalse(list(self.root.glob(".blender-agent-*")))
+
+    def test_glb_artifact_geometry_is_independent_of_worker_report(self):
+        with patch("blender_agent.jobs.shutil.which", return_value="/bin/blender"), \
+             patch("blender_agent.jobs._run_blender", side_effect=self.fake_success):
+            result = execute("convert", workspace=self.root, source="input.stl", output="out.glb")
+        content = (self.root / "out.glb").read_bytes()
+        self.assertEqual(result["geometry"]["faces"], 6)
+        self.assertEqual(result["geometry_scope"], "pre_export_file")
+        self.assertEqual(result["artifact_geometry"]["triangles"], 1)
+        self.assertEqual(result["artifact_validation"], "glb_embedded_base_geometry")
+        self.assertEqual(result["artifact_sha256"], hashlib.sha256(content).hexdigest())
+        self.assertEqual(result["size_bytes"], len(content))
+
+    def test_glb_cancelled_and_late_destination_are_not_published(self):
+        for cancel in (True, False):
+            event = threading.Event()
+            output = self.root / ("cancelled.glb" if cancel else "collision.glb")
+            def late(command, *, cwd, timeout):
+                self.fake_success(command, cwd=cwd, timeout=timeout)
+                if cancel:
+                    event.set()
+                else:
+                    output.write_bytes(b"other writer")
+            with patch("blender_agent.jobs.shutil.which", return_value="/bin/blender"), \
+                 patch("blender_agent.jobs._run_blender", side_effect=late):
+                with self.assertRaises(RuntimeError if cancel else FileExistsError):
+                    execute("create", workspace=self.root, output=output.name, kind="cube", cancelled=event)
+            if cancel:
+                self.assertFalse(output.exists())
+            else:
+                self.assertEqual(output.read_bytes(), b"other writer")
 
     def test_convert_never_modifies_input(self):
         with patch("blender_agent.jobs.shutil.which", return_value="/bin/blender"), \
