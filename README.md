@@ -91,6 +91,10 @@ The input stays in place. Choose fresh output names when repeating the commands.
 
 *Concept illustration of cube geometry. The commands above produce files in `readme-demo`.*
 
+## Development GLB inspection (v0.0.3.5 candidate)
+
+The development source adds Python-only embedded GLB base-geometry inspection and rejects unusable staged GLB exports before publication. The historical v0.0.3 quick-start and capability table below do not include this feature. Use a reviewed development checkout for `blender-agent --workspace readme-demo inspect cube.glb`. See [the inspection contract](docs/HARNESS.md#glb-geometry-inspection) for scope, limits and unsupported extensions.
+
 ## Capabilities
 
 | Operation | Result in v0.0.3 | Needs Blender |
@@ -165,7 +169,7 @@ The development worker requires stable Blender 4.5 LTS (4.5.15 or later within 4
 - **Blender cannot be found.** Confirm the executable path and pass `--blender` for the CLI or `BLENDER_AGENT_BLENDER` in your host environment.
 - **MCP starts in the wrong directory.** Set `BLENDER_AGENT_WORKSPACE` explicitly to an existing absolute path.
 - **The destination already exists or its parent is missing.** Use a fresh output inside the workspace and create its parent directory before running the job.
-- **Inspect rejects a large STL or OBJ.** Detailed inspection is capped at 128 MiB per input. Blender jobs cap the source and published output at 512 MiB each, with a default timeout of 180 seconds.
+- **Inspect rejects a large STL or OBJ.** Detailed STL/OBJ inspection is capped at 128 MiB per input; development GLB inspection and GLB export validation also use this cap. Blender jobs cap the source and published output at 512 MiB each, with a default timeout of 180 seconds.
 - **The format opens but the result looks different.** Check materials, textures, rigging, and animation in the target tool. The roundtrip checks use a geometric cube fixture.
 
 Use a trusted workspace whose files and concurrent writers you control. The worker disables Blender auto-execution. Blender still runs with your account permissions. [Security and reporting](SECURITY.md)

@@ -7,6 +7,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from blender_agent.cli import main
+from test_glb import triangle_glb
 
 
 class CliTests(unittest.TestCase):
@@ -33,6 +34,14 @@ class CliTests(unittest.TestCase):
             with contextlib.redirect_stdout(buffer):
                 self.assertEqual(main(["--workspace", directory, "inspect", "mesh.obj"]), 0)
             self.assertEqual(json.loads(buffer.getvalue())["faces"], 1)
+
+    def test_glb_inspection_without_blender(self):
+        with tempfile.TemporaryDirectory() as directory:
+            Path(directory, "triangle.glb").write_bytes(triangle_glb())
+            buffer = io.StringIO()
+            with contextlib.redirect_stdout(buffer):
+                self.assertEqual(main(["--workspace", directory, "--blender", "missing", "inspect", "triangle.glb"]), 0)
+            self.assertEqual(json.loads(buffer.getvalue())["triangles"], 1)
 
     def test_error_return(self):
         with tempfile.TemporaryDirectory() as directory:

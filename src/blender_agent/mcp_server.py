@@ -5,7 +5,7 @@ import os
 import sys
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
-from threading import Event
+from threading import BoundedSemaphore, Event
 
 from .inspect import inspect_asset
 from .jobs import DEFAULT_TIMEOUT, execute, validate_timeout
@@ -46,7 +46,20 @@ def main(*, workspace: str | None = None, blender: str | None = None, timeout: i
     @server.tool()
     async def inspect_model(path: str) -> dict:
         """Read-only structural inspection of an STL, OBJ, or other supported asset."""
-        return await asyncio.to_thread(inspect_asset, path, root)
+        if not inspection_slot.acquire(blocking=False):
+            raise RuntimeError("Inspection capacity exhausted; retry after the active inspection finishes.")
+        cancelled = Event()
+        try:
+            future = inspection_worker.submit(inspect_asset, path, root, cancelled=cancelled)
+        except BaseException:
+            inspection_slot.release()
+            raise
+        future.add_done_callback(lambda _: inspection_slot.release())
+        try:
+            return await asyncio.wrap_future(future)
+        except asyncio.CancelledError:
+            cancelled.set()
+            raise
 
     @server.tool()
     async def create_primitive(kind: str, output: str, size: float = 1.0) -> dict:
@@ -64,7 +77,9 @@ def main(*, workspace: str | None = None, blender: str | None = None, timeout: i
         return await run_job("repair", source=source, output=output)
 
     # Cancellation of a caller must not free a Blender slot while its worker is still running.
-    with ThreadPoolExecutor(max_workers=1, thread_name_prefix="blender-job") as job_worker:
+    inspection_slot = BoundedSemaphore(1)
+    with (ThreadPoolExecutor(max_workers=1, thread_name_prefix="blender-job") as job_worker,
+          ThreadPoolExecutor(max_workers=1, thread_name_prefix="asset-inspection") as inspection_worker):
         server.run(transport="stdio")
     return 0
 
