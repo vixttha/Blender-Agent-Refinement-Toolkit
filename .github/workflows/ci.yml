@@ -48,6 +48,27 @@ jobs:
           fi
           printf '%s\n' "$rejected"
           [[ "$rejected" == 'Release approval rejected. Release approval requires a manual workflow dispatch.' ]]
+      - name: Retrieve next LTS checksum receipts (temporary qualification bootstrap)
+        if: github.event_name == 'pull_request' && matrix.os == 'ubuntu-latest' && matrix.python-version == '3.12'
+        shell: bash
+        run: |
+          python - <<'PY'
+          import re
+          import urllib.request
+          for series, version, names in (
+              ("4.5", "4.5.17", ("linux-x64.tar.xz", "windows-x64.zip")),
+              ("5.2", "5.2.5", ("linux-x64.tar.xz",)),
+          ):
+              url = f"https://download.blender.org/release/Blender{series}/blender-{version}.sha256"
+              with urllib.request.urlopen(url, timeout=30) as response:
+                  manifest = response.read(16384).decode("ascii")
+              for name in names:
+                  filename = f"blender-{version}-{name}"
+                  matches = [line.split()[0] for line in manifest.splitlines()
+                             if len(line.split()) == 2 and line.split()[1].lstrip("*") == filename]
+                  assert len(matches) == 1 and re.fullmatch(r"[a-fA-F0-9]{64}", matches[0]), filename
+                  print(f"Official checksum receipt: {matches[0].lower()} {filename}", flush=True)
+          PY
       - name: CLI version
         run: python -m blender_agent version
       - name: Verify the published README walkthrough

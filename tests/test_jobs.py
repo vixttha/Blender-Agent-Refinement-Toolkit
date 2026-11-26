@@ -187,6 +187,59 @@ class JobTests(unittest.TestCase):
         self.assertEqual((self.root / "out.mtl").read_bytes(), b"new material")
         self.assertFalse(list(self.root.glob(".blender-agent-obj-*.pending")))
 
+    def test_runtime_rejection_preserves_interrupted_obj_journal(self):
+        for overwrite in (False, True):
+            with self.subTest(overwrite=overwrite), tempfile.TemporaryDirectory() as directory:
+                original_root = self.root
+                self.root = Path(directory).resolve()
+                try:
+                    source = self.root / "input.stl"
+                    source.write_bytes(TRIANGLE_STL)
+                    obj = self.root / "out.obj"
+                    material = obj.with_suffix(".mtl")
+                    if overwrite:
+                        obj.write_bytes(b"previous OBJ")
+                        material.write_bytes(b"previous MTL")
+                    self.interrupt_obj_publication(overwrite=overwrite)
+                    journal, = self.root.glob(".blender-agent-obj-*.pending")
+                    snapshot = {p.name: p.read_bytes() for p in journal.iterdir()}
+                    obj_before = obj.read_bytes() if obj.exists() else None
+                    mtl_before = material.read_bytes()
+
+                    def rejected_report(command, *, cwd, timeout):
+                        self.fake_obj(command, cwd=cwd, timeout=timeout)
+                        job = json.loads(Path(command[-1]).read_text(encoding="utf-8"))
+                        report = Path(job["report"])
+                        data = json.loads(report.read_text(encoding="utf-8"))
+                        data["blender_version"] = "4.5.14"
+                        report.write_text(json.dumps(data), encoding="utf-8")
+
+                    with patch("blender_agent.jobs.shutil.which", return_value="/bin/blender"), \
+                         patch("blender_agent.jobs._run_blender", side_effect=RuntimeError("Unsupported Blender runtime 4.5.14")):
+                        with self.assertRaisesRegex(RuntimeError, "Unsupported Blender runtime"):
+                            execute("convert", workspace=self.root, source="input.stl",
+                                    output="out.obj", overwrite=overwrite)
+                    with patch("blender_agent.jobs.shutil.which", return_value="/bin/blender"), \
+                         patch("blender_agent.jobs._run_blender", side_effect=rejected_report):
+                        with self.assertRaisesRegex(RuntimeError, "runtime report is missing or unsupported"):
+                            execute("convert", workspace=self.root, source="input.stl",
+                                    output="out.obj", overwrite=overwrite)
+                    self.assertEqual({p.name: p.read_bytes() for p in journal.iterdir()}, snapshot)
+                    self.assertEqual(obj.read_bytes() if obj.exists() else None, obj_before)
+                    self.assertEqual(material.read_bytes(), mtl_before)
+                    self.assertEqual(source.read_bytes(), TRIANGLE_STL)
+                    with patch("blender_agent.jobs.shutil.which", return_value="/bin/blender"), \
+                         patch("blender_agent.jobs._run_blender", side_effect=self.fake_obj):
+                        result = execute("convert", workspace=self.root, source="input.stl",
+                                         output="out.obj", overwrite=overwrite)
+                    self.assertTrue(result["ok"])
+                    self.assertEqual(obj.read_bytes(), b"mtllib out.mtl\n" + TRIANGLE_OBJ)
+                    self.assertEqual(material.read_bytes(), b"new material")
+                    self.assertEqual(source.read_bytes(), TRIANGLE_STL)
+                    self.assertFalse(journal.exists())
+                finally:
+                    self.root = original_root
+
     def test_obj_publication_respects_an_active_process_lock(self):
         lock = self.root / "export.lock"
         script = (

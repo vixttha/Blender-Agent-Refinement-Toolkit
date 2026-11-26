@@ -10,6 +10,7 @@ import shlex
 import shutil
 import struct
 import subprocess
+import sys
 import sysconfig
 import tempfile
 from pathlib import Path
@@ -373,6 +374,79 @@ async def verify_blender_scheduling(cli, blender, host_directory, workspace, env
     print("MCP cancellation: a cancelled active request left no output; the subsequent request succeeded.")
 
 
+# Run the actual installed worker in a benign Python subprocess with synthetic
+# bpy metadata. No obsolete Blender binary or untrusted asset is executed.
+REJECTED_RUNTIME_HOST = r"""
+import runpy
+import sys
+from unittest.mock import patch
+from blender_agent import jobs
+from blender_agent.cli import main
+
+original_run = jobs._run_blender
+fixture = '''
+import runpy
+import sys
+from types import SimpleNamespace
+sys.modules["bpy"] = SimpleNamespace(app=SimpleNamespace(version=(4, 5, 14), version_cycle="release"))
+runpy.run_path(sys.argv[1], run_name="__main__")
+'''
+def run_fixture(command, *, cwd, timeout):
+    worker = command[command.index("--python") + 1]
+    return original_run([sys.executable, "-c", fixture, worker, "--", command[-1]],
+                        cwd=cwd, timeout=timeout)
+
+with patch.object(jobs.shutil, "which", return_value=sys.executable), \
+     patch.object(jobs, "_run_blender", side_effect=run_fixture):
+    raise SystemExit(main())
+"""
+
+
+async def verify_runtime_rejection(host_directory, workspace, env):
+    from mcp import ClientSession, StdioServerParameters
+    from mcp.client.stdio import stdio_client
+
+    source = workspace / "mesh.obj"
+    original = source.read_bytes()
+    existing = workspace / "runtime-existing.obj"
+    material = existing.with_suffix(".mtl")
+    existing.write_bytes(b"existing OBJ")
+    material.write_bytes(b"existing MTL")
+    prefix = [sys.executable, "-c", REJECTED_RUNTIME_HOST, "--workspace", str(workspace)]
+    for output, flags in (("runtime-new.obj", []), (existing.name, ["--overwrite"])):
+        rejected = subprocess.run(
+            [*prefix, "convert", source.name, output, *flags],
+            cwd=host_directory, env=env, stdin=subprocess.DEVNULL,
+            capture_output=True, text=True, timeout=30,
+        )
+        assert rejected.returncode == 2, rejected
+        error = json.loads(rejected.stderr)
+        assert error["ok"] is False and "Unsupported Blender runtime 4.5.14" in error["error"], error
+    params = StdioServerParameters(
+        command=sys.executable, args=["-c", REJECTED_RUNTIME_HOST, "--workspace", str(workspace), "mcp"],
+        cwd=host_directory, env=env,
+    )
+    async with asyncio.timeout(60), stdio_client(params) as (reader, writer):
+        async with ClientSession(reader, writer) as session:
+            await session.initialize()
+            for name, args in (
+                ("create_primitive", {"kind": "cube", "output": "runtime-create.stl"}),
+                ("convert_model", {"source": source.name, "output": "runtime-convert.obj"}),
+                ("repair_mesh", {"source": source.name, "output": "runtime-repair.glb"}),
+            ):
+                await expect_error(session, name, "Unsupported Blender runtime 4.5.14", **args)
+            payload = await call_tool(session, "inspect_model", path=source.name)
+            assert payload["faces"] == 1, payload
+    assert source.read_bytes() == original
+    assert existing.read_bytes() == b"existing OBJ"
+    assert material.read_bytes() == b"existing MTL"
+    for name in ("runtime-new.obj", "runtime-new.mtl", "runtime-create.stl",
+                 "runtime-convert.obj", "runtime-convert.mtl", "runtime-repair.glb"):
+        assert not (workspace / name).exists(), name
+    assert not any(workspace.glob(".blender-agent-*"))
+    print("Runtime rejection: installed-wheel CLI subprocess and MCP stdio rejected synthetic affected metadata; source and outputs preserved.", flush=True)
+
+
 async def smoke(blender):
     if blender is not None:
         banner = subprocess.check_output([str(blender), "--version"], text=True, timeout=20)
@@ -468,6 +542,7 @@ async def smoke(blender):
                 payload = await call_tool(session, "inspect_model", path="mesh.obj")
                 assert payload["faces"] == 1, payload
         print("MCP configuration: both launchers reject missing or invalid workspaces; CLI flags take precedence.")
+        await verify_runtime_rejection(host_directory, workspace, env)
         if blender is not None and os.name == "posix":
             await verify_blender_scheduling(cli, blender, host_directory, workspace, env)
 
