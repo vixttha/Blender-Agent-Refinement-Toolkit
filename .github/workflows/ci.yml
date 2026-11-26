@@ -212,7 +212,7 @@ jobs:
           const root = process.argv[2];
           const lock = require(path.join(root, "package-lock.json"));
           const entry = lock.packages["node_modules/gltf-validator"];
-          if (entry.version !== "2.0.0-dev.3.10" || !entry.integrity.startsWith("sha512-")) throw Error("unexpected validator package");
+          if (entry.version !== "2.0.0-dev.3.10" || entry.integrity !== "sha512-odJ4k0tRkGXiDGn78yDBg+fBbAIvBnXxh3RwAta0emSxGtyagFE8B4xELB1oYe3S5RD8Ci3uZAsZaascH2LAEQ==") throw Error("unexpected validator package");
           console.log("Khronos validator package integrity:", entry.integrity);
           const validator = require(path.join(root, "node_modules/gltf-validator"));
           validator.validateBytes(new Uint8Array(fs.readFileSync("asset-sandbox/out/cube.glb")), {maxIssues: 50, format: "glb"})
@@ -244,7 +244,7 @@ jobs:
           path.write_bytes(encode(*fixture(points, indices, component=5125)))
           del points, indices
           started = time.monotonic()
-          result = inspect_asset(path, root)
+          result = inspect_asset(path.name, root)
           elapsed = time.monotonic()-started
           assert result["vertices"] == 251001 and result["triangles"] == 500000
           assert result["degenerate_triangles"] == 0 and result["scene_instance_triangles"] == 500000

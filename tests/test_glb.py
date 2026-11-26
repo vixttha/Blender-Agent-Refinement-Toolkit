@@ -83,6 +83,12 @@ class GlbTests(unittest.TestCase):
         result = check(encode(*fixture(points,(0,1,2,0,0,1))))
         self.assertEqual((result["triangles"],result["degenerate_triangles"],result["usable_triangles"]),(2,1,1))
 
+    def test_reserved_primitive_restart_index(self):
+        points = [(0,0,0),(1,0,0),(0,1,0)] + [(1,1,0)]*253
+        doc,data=fixture(points,indices=(0,1,255),component=5121)
+        with self.assertRaisesRegex(ValueError,"restart index"):
+            check(encode(doc,data))
+
     def test_sparse_positions(self):
         doc,data=fixture(indices=None)
         data = bytes((1,2,0,0))+struct.pack("<6f",1,0,0,0,1,0)

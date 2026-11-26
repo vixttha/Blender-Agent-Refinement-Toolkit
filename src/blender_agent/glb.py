@@ -349,7 +349,10 @@ class _Geometry:
         if "material" in p:
             _int(p["material"], "material reference", maximum=material_count-1)
         mode = _int(p.get("mode", 4), "primitive mode", maximum=6)
+        restart = None
         if "indices" in p:
+            accessor = _ref(self.accessors, p["indices"], "index accessor reference")
+            restart = {5121: 255, 5123: 65535, 5125: 4294967295}.get(accessor["componentType"])
             indices = (i[0] for i in self.values(p["indices"], position=False))
         else:
             self.indices_total += count
@@ -359,8 +362,8 @@ class _Geometry:
         triangles = degenerate = n = 0
         first = previous = before = None
         for i in indices:
-            if i >= count:
-                _fail("index outside POSITION")
+            if i == restart or i >= count:
+                _fail("reserved restart index or index outside POSITION")
             n += 1
             tri = None
             if mode == 4 and n % 3 == 0:
