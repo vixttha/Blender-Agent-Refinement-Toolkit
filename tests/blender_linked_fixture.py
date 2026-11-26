@@ -132,6 +132,15 @@ def create_repair_scope(project, library, active_linked_project):
     assert "FINISHED" in bpy.ops.wm.save_as_mainfile(filepath=str(active_linked_project))
 
 
+def create_empty_mesh(project):
+    bpy.ops.wm.read_factory_settings(use_empty=True)
+    mesh = bpy.data.meshes.new("Empty Mesh")
+    obj = bpy.data.objects.new("Empty Mesh", mesh)
+    bpy.context.scene.collection.objects.link(obj)
+    assert len(mesh.vertices) == len(mesh.polygons) == 0
+    assert "FINISHED" in bpy.ops.wm.save_as_mainfile(filepath=str(project))
+
+
 if __name__ == "__main__":
     action, *paths = sys.argv[sys.argv.index("--") + 1:]
     operations = {
@@ -142,5 +151,6 @@ if __name__ == "__main__":
         "create_multi_scene": create_multi_scene,
         "verify_multi_scene": verify_multi_scene,
         "create_repair_scope": create_repair_scope,
+        "create_empty_mesh": create_empty_mesh,
     }
     operations[action](*(Path(path) for path in paths))

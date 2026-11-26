@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.0.3.5 — development checkpoint
+
+- Add bounded Python-only embedded GLB base geometry inspection and pre-publication validation, with independent artifact geometry and digest distinct from worker source counts (#114, successor to #14). Preserve the historical published v0.0.3 package and existing runtime safety.
+
 ## v0.0.3.4 — development checkpoint
 
 - Require patched stable Blender 4.5 LTS (4.5.15+) or 5.2 LTS (5.2.3+) before any Blender operation, expose the effective runtime version, and validate current LTS builds with benign fixtures (#45).

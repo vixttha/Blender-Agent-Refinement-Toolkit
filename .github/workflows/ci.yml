@@ -201,6 +201,56 @@ jobs:
                   assert abs(info["bounds"]["max"][axis] - 0.5) < 0.005, (name, info)
           print("Blender real-format geometry roundtrip: PASS")
           PY
+      - name: Cross-check native GLB with Khronos validator
+        if: matrix.version == '4.5.17'
+        shell: bash
+        run: |
+          npm install --prefix "$RUNNER_TEMP/gltf-validator" --ignore-scripts --no-audit --no-fund --save-exact gltf-validator@2.0.0-dev.3.10
+          node - "$RUNNER_TEMP/gltf-validator" <<'JS'
+          const fs = require("fs");
+          const path = require("path");
+          const root = process.argv[2];
+          const lock = require(path.join(root, "package-lock.json"));
+          const entry = lock.packages["node_modules/gltf-validator"];
+          if (entry.version !== "2.0.0-dev.3.10" || !entry.integrity.startsWith("sha512-")) throw Error("unexpected validator package");
+          console.log("Khronos validator package integrity:", entry.integrity);
+          const validator = require(path.join(root, "node_modules/gltf-validator"));
+          validator.validateBytes(new Uint8Array(fs.readFileSync("asset-sandbox/out/cube.glb")), {maxIssues: 50, format: "glb"})
+            .then(report => {
+              console.log("Khronos native cube validation:", JSON.stringify(report.issues));
+              if (report.issues.numErrors !== 0) process.exitCode = 1;
+            }).catch(error => { console.error(error); process.exitCode = 1; });
+          JS
+      - name: Measure deterministic 500000-triangle GLB inspection
+        if: matrix.version == '4.5.17'
+        shell: bash
+        run: |
+          PYTHONPATH=tests python - <<'PY'
+          import resource
+          import time
+          from pathlib import Path
+          from blender_agent.inspect import inspect_asset
+          from test_glb import fixture, encode
+          n = 500
+          points = [(x, y, 0) for y in range(n+1) for x in range(n+1)]
+          indices = []
+          for y in range(n):
+              for x in range(n):
+                  a = y*(n+1)+x
+                  b = a+n+1
+                  indices.extend((a,a+1,b,a+1,b+1,b))
+          root = Path("asset-sandbox")
+          path = root/"grid.glb"
+          path.write_bytes(encode(*fixture(points, indices, component=5125)))
+          del points, indices
+          started = time.monotonic()
+          result = inspect_asset(path, root)
+          elapsed = time.monotonic()-started
+          assert result["vertices"] == 251001 and result["triangles"] == 500000
+          assert result["degenerate_triangles"] == 0 and result["scene_instance_triangles"] == 500000
+          assert result["bounds"] == {"min":[0,0,0],"max":[500,500,0]}
+          print(f"Synthetic grid: {result['triangles']} triangles; {result['size_bytes']} bytes; {elapsed:.3f}s; process peak RSS {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss} KiB (includes fixture construction)")
+          PY
       - name: Exercise the installed MCP wheel with real Blender
         env:
           BLENDER_BIN: ${{ github.workspace }}/blender-dist/blender

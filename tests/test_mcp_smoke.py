@@ -559,6 +559,13 @@ async def smoke(blender):
                     await blender_roundtrip(session, workspace)
                     await obj_material_roundtrip(session, workspace)
                     await reject_faceless_output(session, workspace)
+                    empty = workspace / "empty.blend"
+                    await run_blender_fixture(blender, "create_empty_mesh", empty)
+                    before = empty.read_bytes()
+                    await expect_error(session, "convert_model", "No mesh faces are available for output.",
+                                       source=empty.name, output="empty.glb")
+                    assert empty.read_bytes() == before and not (workspace / "empty.glb").exists()
+                    print("Native empty mesh project rejected without publication: PASS")
                     await verify_blend_dependency(session, workspace, blender)
                     await verify_shared_mesh_repair(session, workspace, blender)
                     await verify_multi_scene_geometry(session, workspace, blender)
