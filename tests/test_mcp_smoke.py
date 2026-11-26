@@ -497,6 +497,7 @@ async def smoke(blender):
         assert invalid_timeout.returncode == 2 and "between 1 and 900" in invalid_timeout.stderr, invalid_timeout
         if blender is not None:
             env["BLENDER_AGENT_BLENDER"] = str(blender.resolve(strict=True))
+        await verify_runtime_rejection(host_directory, workspace, env)
         params = StdioServerParameters(
             command=launcher,
             cwd=host_directory,
@@ -542,7 +543,6 @@ async def smoke(blender):
                 payload = await call_tool(session, "inspect_model", path="mesh.obj")
                 assert payload["faces"] == 1, payload
         print("MCP configuration: both launchers reject missing or invalid workspaces; CLI flags take precedence.")
-        await verify_runtime_rejection(host_directory, workspace, env)
         if blender is not None and os.name == "posix":
             await verify_blender_scheduling(cli, blender, host_directory, workspace, env)
 
