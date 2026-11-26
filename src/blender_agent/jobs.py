@@ -13,6 +13,7 @@ import threading
 from contextlib import contextmanager
 from pathlib import Path
 
+from .blender_worker import require_runtime
 from .inspect import MAX_PREVIEW_BYTES, inspect_mesh
 from .obj_records import obj_records
 from .paths import destination_path, root_path, source_path, within_workspace
@@ -309,6 +310,15 @@ def execute(
         if (not isinstance(details, dict) or details.get("mesh_objects", 0) < 1
                 or details.get("vertices", 0) < 3 or details.get("faces", 0) < 1):
             raise RuntimeError("Blender geometry report is incomplete.")
+        blender_version = details.pop("blender_version", None)
+        try:
+            if not isinstance(blender_version, str) or len(blender_version) > 32:
+                raise ValueError("Missing runtime version")
+            reported = require_runtime(tuple(int(part) for part in blender_version.split(".")), "release")
+            if reported != blender_version:
+                raise ValueError("Noncanonical runtime version")
+        except (ValueError, RuntimeError) as exc:
+            raise RuntimeError("Blender runtime report is missing or unsupported.") from exc
         artifact_validation = "nonempty_file"
         suffix = final.suffix.lower()
         if suffix in {".stl", ".obj"} and size <= MAX_PREVIEW_BYTES:
@@ -326,6 +336,7 @@ def execute(
     result = {
         "ok": True, "operation": operation, "output": str(final.relative_to(root)),
         "size_bytes": size, "geometry": details,
+        "blender_version": blender_version,
         "geometry_scope": "pre_export_file" if suffix in {".blend", ".glb"} else "pre_export_scene",
         "artifact_validation": artifact_validation,
         "note": "Geometry summary only; not a production or printability certification.",

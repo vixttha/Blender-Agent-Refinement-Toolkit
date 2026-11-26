@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.0.3.4 — development checkpoint
+
+- Require patched stable Blender 4.5 LTS (4.5.15+) or 5.2 LTS (5.2.3+) before any Blender operation, expose the effective runtime version, and validate current LTS builds with benign fixtures (#45).
+
 ## v0.0.3.3 — development checkpoint
 
 - Scope repair to the existing pre-export geometry selection, so inactive linked reference scenes do not prevent active-scene mesh repair. Retain rejection of in-scope read-only meshes and file-wide BLEND/GLB repair (#69).
