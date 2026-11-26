@@ -3,11 +3,11 @@
   "active": {
     "issue": 114,
     "version": "v0.0.3.5",
-    "phase": "Validate",
-    "next_action": "Repeat public matrix and exact-head CodeRabbit after three format-boundary repairs. No merge/release.",
-    "fix_sha": "cffe226a9580313e93ed3e9df4d323130bcfe884",
-    "candidate_sha": "cffe226a9580313e93ed3e9df4d323130bcfe884",
-    "pull_request": 115,
+    "phase": "Worker",
+    "next_action": "Repair three verified CodeRabbit findings; preserve both predecessor reviews and requalify.",
+    "fix_sha": null,
+    "candidate_sha": null,
+    "pull_request": null,
     "evidence": []
   },
   "history": [
@@ -112,6 +112,21 @@
       },
       "disposition": "rework",
       "decision": "Solo exact-head audit against Khronos glTF 2.0 alignment and sparse-accessor rules and KHR_meshopt_compression: support permitted matrix trailing padding, reject sparse view target and KHR meshopt alongside EXT. Preserve passing 10/10 evidence as historical; rerun affected candidate.",
+      "merged_sha": null
+    },
+    {
+      "handoff": {
+        "issue": 114,
+        "version": "v0.0.3.5",
+        "phase": "Validate",
+        "next_action": "Repeat public matrix and exact-head CodeRabbit after three format-boundary repairs. No merge/release.",
+        "fix_sha": "cffe226a9580313e93ed3e9df4d323130bcfe884",
+        "candidate_sha": "cffe226a9580313e93ed3e9df4d323130bcfe884",
+        "pull_request": 115,
+        "evidence": []
+      },
+      "disposition": "rework",
+      "decision": "CodeRabbit review 6081140758 of predecessor 2708124 confirms KHR meshopt and matrix padding already repaired; three still-valid findings: exact float32 collinearity, float32 bounds equality, cancellation message assertion. Rework current candidate. Partial run 45905133815 retained.",
       "merged_sha": null
     }
   ]
