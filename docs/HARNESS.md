@@ -38,14 +38,14 @@ Cancelling a queued request prevents it from publishing. An active Blender proce
 
 The optional dependency requires `mcp>=1.30.0,<2`. Public CI on Linux and Windows starts the installed `blender-agent-mcp` command from a separate working directory, initializes a real stdio session, checks each tool's input schema, and verifies workspace isolation and read-only inspection. Individual MCP hosts may require different launch configuration.
 
-The Ubuntu development jobs also run all four tools over MCP stdio with Blender 4.5.16 and 5.2.4. They check an STL → GLB → STL cube roundtrip, verify that repair welds a split edge, and confirm that in-place edits and overwrites are rejected while the existing files retain their original bytes.
+The Ubuntu development jobs also run all four tools over MCP stdio with Blender 4.5.17 and 5.2.5. They check an STL → GLB → STL cube roundtrip, verify that repair welds a split edge, and confirm that in-place edits and overwrites are rejected while the existing files retain their original bytes.
 
 | Public check | Configuration | Coverage |
 | --- | --- | --- |
 | Python tests | Python 3.11 and 3.12 on Ubuntu and Windows | Unit and negative-path tests |
 | MCP stdio | Python 3.12 and MCP SDK 1.30.0 on Ubuntu and Windows | Built wheel, installed launchers, discovery, configuration, and inspection |
-| Blender workflow | Python 3.12 on Ubuntu 24.04, with Blender 4.5.16 at the SDK minimum and Blender 5.2.4 using the normal dependency resolver | CLI roundtrips and built-wheel MCP jobs with real Blender |
-| Windows Blender workflow | Python 3.12, SDK minimum, and Blender 4.5.16 on Windows | Installed-wheel MCP jobs with real Blender |
+| Blender workflow | Python 3.12 on Ubuntu 24.04, with Blender 4.5.17 at the SDK minimum and Blender 5.2.5 using the normal dependency resolver | CLI roundtrips and built-wheel MCP jobs with real Blender |
+| Windows Blender workflow | Python 3.12, SDK minimum, and Blender 4.5.17 on Windows | Installed-wheel MCP jobs with real Blender |
 
 CI records the interpreter patch version, platform, and installed MCP dependencies. The public MCP extra declares the SDK v1 API range. Runtime admission and exact pinned artifacts are described below. Other versions on Windows, macOS, and named desktop MCP hosts need separate verification. Default output publication requires hard-link support on the workspace filesystem.
 
@@ -63,11 +63,11 @@ The development worker admits stable Blender 4.5 LTS (4.5.15 or later within 4.5
 
 | CI runtime | Official archive | Pinned SHA-256 |
 | --- | --- | --- |
-| Blender 4.5.16 Linux x64 | [4.5.16 checksums](https://download.blender.org/release/Blender4.5/blender-4.5.16.sha256) | `23432b064977908beb1ab4b7f32f024e7331105c875c187dce002aff84b10c11` |
-| Blender 4.5.16 Windows x64 | [4.5.16 checksums](https://download.blender.org/release/Blender4.5/blender-4.5.16.sha256) | `e258e90a1ebc14798ad65b3426bc5f11f5e0e013541c61cc7c3ee9bbf4ca0ce6` |
-| Blender 5.2.4 Linux x64 | [5.2.4 checksums](https://download.blender.org/release/Blender5.2/blender-5.2.4.sha256) | `2fd14c50987426897ba60237ee996edf2b4151f4b1a72a460ca20be58c1d2d86` |
+| Blender 4.5.17 Linux x64 | [4.5.17 checksums](https://download.blender.org/release/Blender4.5/blender-4.5.17.sha256) | `b7d09d1aa7c346fed1e56390e815dbf1589d47324734fbad9e2007fe75ca0b8d` |
+| Blender 4.5.17 Windows x64 | [4.5.17 checksums](https://download.blender.org/release/Blender4.5/blender-4.5.17.sha256) | `282b9bfc14065d6341c0d70d83992f80bde09d99e0099bff260c94bbec93803d` |
+| Blender 5.2.5 Linux x64 | [5.2.5 checksums](https://download.blender.org/release/Blender5.2/blender-5.2.5.sha256) | `6a93f1316ea794dec3027129fbc05f48b368184be25a8f993dd0301a6020a204` |
 
-The digests came from the official release checksum manifests retrieved and verified on the public GitHub runners in [bootstrap run 45338749258](https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/actions/runs/45338749258/attempts/1). That run exercised these exact three archives with real installed-wheel MCP fixtures. The current CI pins the values instead of dynamically trusting a manifest; every download (including a mirror fallback) must match before extraction. The worker reports the actual version and the test suite compares it with the expected matrix version. Check [current CI](https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/actions/workflows/ci.yml) for the exact candidate result.
+The pinned digests for these newer releases came from the official release checksum manifests retrieved on the public Ubuntu runner in [checksum bootstrap job 140181630847](https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/actions/runs/45899533922/job/140181630847). The earlier [bootstrap run 45338749258](https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/actions/runs/45338749258/attempts/1) remains historical evidence for the previous 4.5.16/5.2.4 matrix, not these new archives. The current CI pins the values instead of dynamically trusting a manifest; every download (including a mirror fallback) must match before extraction. The worker reports the actual version and the test suite compares it with the expected matrix version. Check [current CI](https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/actions/workflows/ci.yml) for the exact candidate result.
 
 ## Trust and limits
 

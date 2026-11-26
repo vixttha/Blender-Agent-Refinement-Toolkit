@@ -48,27 +48,6 @@ jobs:
           fi
           printf '%s\n' "$rejected"
           [[ "$rejected" == 'Release approval rejected. Release approval requires a manual workflow dispatch.' ]]
-      - name: Retrieve next LTS checksum receipts (temporary qualification bootstrap)
-        if: github.event_name == 'pull_request' && matrix.os == 'ubuntu-latest' && matrix.python-version == '3.12'
-        shell: bash
-        run: |
-          python - <<'PY'
-          import re
-          import urllib.request
-          for series, version, names in (
-              ("4.5", "4.5.17", ("linux-x64.tar.xz", "windows-x64.zip")),
-              ("5.2", "5.2.5", ("linux-x64.tar.xz",)),
-          ):
-              url = f"https://download.blender.org/release/Blender{series}/blender-{version}.sha256"
-              with urllib.request.urlopen(url, timeout=30) as response:
-                  manifest = response.read(16384).decode("ascii")
-              for name in names:
-                  filename = f"blender-{version}-{name}"
-                  matches = [line.split()[0] for line in manifest.splitlines()
-                             if len(line.split()) == 2 and line.split()[1].lstrip("*") == filename]
-                  assert len(matches) == 1 and re.fullmatch(r"[a-fA-F0-9]{64}", matches[0]), filename
-                  print(f"Official checksum receipt: {matches[0].lower()} {filename}", flush=True)
-          PY
       - name: CLI version
         run: python -m blender_agent version
       - name: Verify the published README walkthrough
@@ -131,13 +110,13 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - version: "4.5.16"
+          - version: "4.5.17"
             series: "4.5"
-            sha256: 23432b064977908beb1ab4b7f32f024e7331105c875c187dce002aff84b10c11
+            sha256: b7d09d1aa7c346fed1e56390e815dbf1589d47324734fbad9e2007fe75ca0b8d
             mcp-mode: minimum
-          - version: "5.2.4"
+          - version: "5.2.5"
             series: "5.2"
-            sha256: 2fd14c50987426897ba60237ee996edf2b4151f4b1a72a460ca20be58c1d2d86
+            sha256: 6a93f1316ea794dec3027129fbc05f48b368184be25a8f993dd0301a6020a204
             mcp-mode: resolver
     steps:
       - name: Checkout
@@ -154,7 +133,7 @@ jobs:
           BLENDER_VERSION: ${{ matrix.version }}
           BLENDER_SERIES: ${{ matrix.series }}
           BLENDER_SHA256: ${{ matrix.sha256 }}
-          SIMULATE_PRIMARY_FAILURE: ${{ github.event_name == 'pull_request' && matrix.version == '5.2.4' }}
+          SIMULATE_PRIMARY_FAILURE: ${{ github.event_name == 'pull_request' && matrix.version == '5.2.5' }}
         run: |
           release="release/Blender${BLENDER_SERIES}/blender-${BLENDER_VERSION}-linux-x64.tar.xz"
           download_primary() {
@@ -230,7 +209,7 @@ jobs:
         run: python tests/run_mcp_wheel_smoke.py --blender "$BLENDER_BIN" --mcp-mode "$MCP_MODE"
 
   blender-windows:
-    name: Blender 4.5.16 installed-wheel MCP / Windows
+    name: Blender 4.5.17 installed-wheel MCP / Windows
     runs-on: windows-latest
     timeout-minutes: 15
     steps:
@@ -246,19 +225,19 @@ jobs:
         shell: pwsh
         run: |
           $PSNativeCommandUseErrorActionPreference = $false
-          $release = 'release/Blender4.5/blender-4.5.16-windows-x64.zip'
+          $release = 'release/Blender4.5/blender-4.5.17-windows-x64.zip'
           $archive = Join-Path $env:RUNNER_TEMP 'blender.zip'
           curl.exe --fail --location --retry 2 --silent --show-error "https://download.blender.org/$release" -o $archive
           if ($LASTEXITCODE -ne 0) {
             curl.exe --fail --location --retry 2 --silent --show-error "https://mirror.clarkson.edu/blender/$release" -o $archive
             if ($LASTEXITCODE -ne 0) { throw 'Blender download failed' }
           }
-          $expected = 'e258e90a1ebc14798ad65b3426bc5f11f5e0e013541c61cc7c3ee9bbf4ca0ce6'
-          Write-Output "Pinned Blender archive SHA-256: blender-4.5.16-windows-x64.zip $expected"
+          $expected = '282b9bfc14065d6341c0d70d83992f80bde09d99e0099bff260c94bbec93803d'
+          Write-Output "Pinned Blender archive SHA-256: blender-4.5.17-windows-x64.zip $expected"
           if ((Get-FileHash -Algorithm SHA256 $archive).Hash -ne $expected) { throw 'Blender archive checksum mismatch' }
           tar.exe -xf $archive -C $env:RUNNER_TEMP
           if ($LASTEXITCODE -ne 0) { throw 'Blender extraction failed' }
-          $blender = Get-ChildItem (Join-Path $env:RUNNER_TEMP 'blender-4.5.16-windows-x64') -Filter blender.exe
+          $blender = Get-ChildItem (Join-Path $env:RUNNER_TEMP 'blender-4.5.17-windows-x64') -Filter blender.exe
           if (!$blender) { throw 'Blender executable missing after extraction' }
           & $blender.FullName --version
           if ($LASTEXITCODE -ne 0) { throw 'Blender could not start' }
@@ -266,7 +245,7 @@ jobs:
       - name: Exercise the installed MCP wheel with real Blender
         shell: pwsh
         env:
-          BART_EXPECTED_BLENDER_VERSION: "4.5.16"
+          BART_EXPECTED_BLENDER_VERSION: "4.5.17"
         run: python tests/run_mcp_wheel_smoke.py --blender "$env:BLENDER_BIN"
 
   release-readiness:

@@ -150,7 +150,7 @@ Look for the same **3 vertices, 1 face, and bounds** as in the CLI result. The S
 | --- | --- |
 | Python CLI | Python 3.11 and 3.12 on Ubuntu and Windows |
 | Installed-wheel MCP stdio | Linux and Windows, including startup from outside the workspace, tool schemas, and read-only inspection |
-| Blender and MCP | Current development CI matrix: Blender 4.5.16 and 5.2.4 on Ubuntu, and Blender 4.5.16 on Windows. Checks include all four tool calls, geometry, source preservation, and OBJ material re-import. See [exact versions and checksums](docs/HARNESS.md#blender-runtime-policy). |
+| Blender and MCP | Current development CI matrix: Blender 4.5.17 and 5.2.5 on Ubuntu, and Blender 4.5.17 on Windows. Checks include all four tool calls, geometry, source preservation, and OBJ material re-import. See [exact versions and checksums](docs/HARNESS.md#blender-runtime-policy). |
 
 The development worker requires stable Blender 4.5 LTS (4.5.15 or later within 4.5) or 5.2 LTS (5.2.3 or later within 5.2). Successful Blender jobs report `blender_version`; Python-only inspection needs no Blender. Other branches and prereleases are rejected. Runtime admission is not a guarantee of compatibility or immunity to future vulnerabilities. Named MCP hosts, macOS runners, and additional format combinations need their own checks. [v0.0.3 application checks](https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/actions/runs/44469831772) · [Detailed compatibility and known limits](docs/HARNESS.md)
 
