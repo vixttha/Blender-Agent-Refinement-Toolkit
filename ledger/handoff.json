@@ -3,14 +3,12 @@
   "active": {
     "issue": 114,
     "version": "v0.0.3.5",
-    "phase": "Internal Auditor",
-    "next_action": "Complete exact-head CodeRabbit read-back, evaluate any new findings and finalize solo merge review. No merge/release.",
-    "fix_sha": "062dc86ac8d0bcee0d9c3552bb01c2138486b1e2",
-    "candidate_sha": "062dc86ac8d0bcee0d9c3552bb01c2138486b1e2",
-    "pull_request": 115,
-    "evidence": [
-      "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/actions/runs/45905384249/attempts/1"
-    ]
+    "phase": "Worker",
+    "next_action": "Implement owner-approved parser isolation and four current CodeRabbit findings; exact scope amendment in issue and ledger.",
+    "fix_sha": null,
+    "candidate_sha": null,
+    "pull_request": null,
+    "evidence": []
   },
   "history": [
     {
@@ -129,6 +127,23 @@
       },
       "disposition": "rework",
       "decision": "CodeRabbit review 6081140758 of predecessor 2708124 confirms KHR meshopt and matrix padding already repaired; three still-valid findings: exact float32 collinearity, float32 bounds equality, cancellation message assertion. Rework current candidate. Partial run 45905133815 retained.",
+      "merged_sha": null
+    },
+    {
+      "handoff": {
+        "issue": 114,
+        "version": "v0.0.3.5",
+        "phase": "Internal Auditor",
+        "next_action": "Complete exact-head CodeRabbit read-back, evaluate any new findings and finalize solo merge review. No merge/release.",
+        "fix_sha": "062dc86ac8d0bcee0d9c3552bb01c2138486b1e2",
+        "candidate_sha": "062dc86ac8d0bcee0d9c3552bb01c2138486b1e2",
+        "pull_request": 115,
+        "evidence": [
+          "https://github.com/vixttha/Blender-Agent-Refinement-Toolkit/actions/runs/45905384249/attempts/1"
+        ]
+      },
+      "disposition": "rework",
+      "decision": "Owner approves Option B then A: parser isolation/security scope amendment; CodeRabbit exact 062dc86 posted four actionable findings. Preserve previous 10/10; repair same lane, requalify. No merge/release.",
       "merged_sha": null
     }
   ]
